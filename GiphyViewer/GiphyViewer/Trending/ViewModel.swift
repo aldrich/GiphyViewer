@@ -9,5 +9,13 @@
 import Foundation
 
 class ViewModel {
-	
+	private let networking = NetworkingApi()
+
+	var newItems: (([GifObject]) -> Void)?
+
+	init() {
+		networking.getTrendingGifs { [weak self] gifs in
+			self?.newItems?(gifs)
+		}
+	}
 }

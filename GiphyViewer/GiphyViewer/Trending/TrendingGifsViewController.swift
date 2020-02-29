@@ -8,9 +8,9 @@
 
 import UIKit
 import SnapKit
+import SwiftyGif
 
-class ViewController: UIViewController {
-	
+class TrendingGifsViewController: UIViewController {
 	
 	private var cellSizes = [[CGSize]]()
 	
@@ -18,13 +18,10 @@ class ViewController: UIViewController {
 	private let collectionViewProvider = CollectionViewProvider()	
 	
 	let collectionView: UICollectionView = {
-		
-		let collVw = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-		
-		// configure collection view appearance here.
-		
+		let layout = UICollectionViewFlowLayout()
+		let collVw = UICollectionView(frame: .zero,
+									  collectionViewLayout: layout)
 		return collVw
-		
 	}()
 	
 	init(viewModel: ViewModel) {
@@ -41,75 +38,71 @@ class ViewController: UIViewController {
 		
 		collectionView.register(ContentCell.self,
 								forCellWithReuseIdentifier: "ContentCell")
-		
+		collectionView.register(HeaderView.self,
+								forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+								withReuseIdentifier: "HeaderViewIdentifier")
+		collectionView.register(FooterView.self,
+								forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+								withReuseIdentifier: "FooterViewIdentifier")
+
 		view.addSubview(collectionView)
 		collectionView.snp.makeConstraints { make in
 			make.edges.equalToSuperview()
 		}
 		
-		view.backgroundColor = .green
-		collectionView.backgroundColor = .cyan
+		collectionView.backgroundColor = .white
 		
 		setupCollectionView()
 		prepareCellSizes()
 		
 		collectionView.reloadData()
+
+		viewModel.newItems = { [weak self] gifs in
+			self?.collectionViewProvider.items = [gifs] // give first section
+			self?.collectionViewProvider.supplementaryItems = ["i"]
+			self?.prepareCellSizes()
+			self?.collectionView.reloadData()
+		}
 	}
 	
 	private func setupCollectionView() {
 		collectionView.dataSource = collectionViewProvider
-		
-		let firstSectionItems = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
-								 "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen",
-								 "eighteen", "nineteen", "twenty"]
-		
-		let secondSectionItems = ["activity", "appstore", "calculator", "camera", "contacts", "clock", "facetime",
-								  "health", "mail", "messages", "music", "notes", "phone", "photos", "podcasts",
-								  "reminders", "safari", "settings", "shortcuts", "testflight", "wallet", "watch",
-								  "weather"]
-		
-		
-		collectionViewProvider.items = [firstSectionItems, secondSectionItems]
-		collectionViewProvider.supplementaryItems = ["numbers", "apps"]
-		
+		collectionViewProvider.items = []
+		collectionViewProvider.supplementaryItems = []
 		let layout = GridLayout()
 		collectionView.collectionViewLayout = layout
 		layout.delegate = self
-		
+		layout.cellsPadding = ItemsPadding(horizontal: 8, vertical: 8)
 	}
 	
 	private func prepareCellSizes() {
-		let range = 50...150
 		cellSizes.removeAll()
 		collectionViewProvider.items.forEach { items in
 			let sizes = items.map { item -> CGSize in
-				let height = CGFloat(Int.random(in: range))
-				return CGSize(width: 0.1, height: height)
+				if let image = item.images["fixed_width_downsampled"],
+					let heightStr = image.height,
+					let height = Float(heightStr) {
+					return CGSize(width: 200, height: CGFloat(height))
+				}
+				return CGSize(width: 200, height: 0.1)
 			}
 			cellSizes.append(sizes)
 		}
 	}
 }
 
-extension ViewController: LayoutDelegate {
+extension TrendingGifsViewController: LayoutDelegate {
 	func cellSize(indexPath: IndexPath) -> CGSize {
 		return cellSizes[indexPath.section][indexPath.row]
 	}
 	
 	func headerHeight(indexPath: IndexPath) -> CGFloat {
-        return 0
+        return 12
     }
 
     func footerHeight(indexPath: IndexPath) -> CGFloat {
-        return 0
+        return 12
     }
-}
-
-class ContentCell: UICollectionViewCell {
-	
-	func populate(with item: String) {
-		backgroundColor = UIColor.random()// .withAlphaComponent(0.5)
-	}
 }
 
 extension CGFloat {
@@ -122,4 +115,26 @@ extension UIColor {
     static func random() -> UIColor {
         return UIColor(red: .random(), green: .random(), blue: .random(), alpha: 1.0)
     }
+}
+
+extension GifObject {
+
+	var urlFixedWidth: URL? {
+		if let url = fixedWidthDownsampledImage?.url {
+			return URL(string: url)
+		}
+		return nil
+	}
+
+	var heightFixedWidth: CGFloat? {
+		if let heightStr = fixedWidthDownsampledImage?.height,
+			let floatValue = NumberFormatter().number(from: heightStr)?.floatValue {
+			return CGFloat(floatValue)
+		}
+		return nil
+	}
+
+	var fixedWidthDownsampledImage: ImageObject? {
+		return images["fixed_width_downsampled"]
+	}
 }
