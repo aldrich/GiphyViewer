@@ -22,8 +22,7 @@ class TrendingGifsViewModel {
 			NetworkingAPI.getTrendingGifs(offset: index * 25, limit: 25) { [weak self] gifs, offset in
 				guard let self = self else { return }
 				self.results[index] = gifs
-				let res = self.flattenedGifsResults
-				self.newItems?(res)
+				self.newItems?(self.flattenedGifsResults)
 			}
 		}
 	}

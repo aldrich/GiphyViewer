@@ -1,24 +1,20 @@
 PODS:
-  - SkeletonView (1.8.6)
+  - Gifu (3.2.0)
   - SnapKit (5.0.1)
-  - SwiftyGif (5.2.0)
 
 DEPENDENCIES:
-  - SkeletonView
+  - Gifu
   - SnapKit
-  - SwiftyGif
 
 SPEC REPOS:
   trunk:
-    - SkeletonView
+    - Gifu
     - SnapKit
-    - SwiftyGif
 
 SPEC CHECKSUMS:
-  SkeletonView: 0bf463145522c0c551b76a829b397e2a15a16d46
+  Gifu: 7bcb6427457d85e0b4dff5a84ec5947ac19a93ea
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
-  SwiftyGif: b85c6b33a9411859d9e1db998b6a8214aea942df
 
-PODFILE CHECKSUM: df4381c84bcdf9c2110423f88125fa09051a85e4
+PODFILE CHECKSUM: acb5e5742e9102252784824721da8012a96f8326
 
 COCOAPODS: 1.8.4

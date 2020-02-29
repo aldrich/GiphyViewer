@@ -7,39 +7,39 @@
 //
 
 import UIKit
-import SwiftyGif
+import Gifu
 
 class ContentCell: UICollectionViewCell {
 
 	override func prepareForReuse() {
 		super.prepareForReuse()
-		imageView.clear()
+		imageView.stopAnimatingGIF()
+		imageView.prepareForReuse()
 		label.text = nil
 	}
 
 	let label: UILabel = {
 		let ret = UILabel()
 		ret.textColor = .white
-		ret.backgroundColor = .black
+		ret.backgroundColor = UIColor(white: 0, alpha: 0.6)
 		ret.numberOfLines = 0
 		ret.font = .systemFont(ofSize: 12)
 		ret.textAlignment = .center
 		return ret
 	}()
 
-	let imageView: UIImageView = {
-		let ret = UIImageView()
+	let imageView: GIFImageView = {
+		let ret = GIFImageView()
 		return ret
 	}()
 
-	func populate(with item: GifObject) {
+	func populate(with item: GifObject, index: Int) {
 		backgroundColor = UIColor.random()
-			.withAlphaComponent(0.5)
+			.withAlphaComponent(0.3)
 		label.text = item.title
+		imageView.image = nil
 		if let url = item.urlFixedWidth {
-			imageView.setGifFromURL(url, levelOfIntegrity: .lowForTooManyGifs)
-		} else {
-			print()
+			imageView.animate(withGIFURL: url)
 		}
 	}
 
@@ -59,37 +59,6 @@ class ContentCell: UICollectionViewCell {
 
 	required init?(coder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
-	}
-}
-
-class HeaderView: UICollectionReusableView {
-
-	let label: UILabel = {
-		let ret = UILabel()
-		ret.textColor = .white
-		ret.numberOfLines = 0
-		ret.font = .systemFont(ofSize: 12)
-		ret.textAlignment = .center
-		return ret
-	}()
-
-	override init(frame: CGRect) {
-		super.init(frame: frame)
-		self.addSubview(label)
-		label.snp.makeConstraints { make in
-			make.center.equalToSuperview()
-			make.left.equalToSuperview().offset(10)
-		}
-	}
-
-	required init?(coder: NSCoder) {
-		fatalError("init(coder:) has not been implemented")
-	}
-
-	func populate(with item: String) {
-		label.text = item
-
-		backgroundColor = UIColor.random().withAlphaComponent(0.5)
 	}
 }
 

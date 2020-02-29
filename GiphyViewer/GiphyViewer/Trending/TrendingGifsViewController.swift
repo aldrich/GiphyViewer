@@ -15,7 +15,10 @@ class TrendingGifsViewController: UIViewController {
 	
 	private let viewModel: TrendingGifsViewModel
 	private let collectionViewProvider = CollectionViewProvider()	
-	
+
+	// used to record scroll position when switching orientation
+	private var lastVisibleIndexPath: IndexPath?
+
 	let collectionView: UICollectionView = {
 		let layout = UICollectionViewFlowLayout()
 		let collVw = UICollectionView(frame: .zero,
@@ -29,15 +32,33 @@ class TrendingGifsViewController: UIViewController {
 		self.title = "Trending"
 	}
 
+	override func viewWillLayoutSubviews() {
+		super.viewWillLayoutSubviews()
+
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+			if let lastVisibleIndexPath = self?.lastVisibleIndexPath {
+				self?.collectionView.scrollToItem(at: lastVisibleIndexPath,
+												  at: .top,
+												  animated: false)
+				print("scroll to \(lastVisibleIndexPath.row)")
+				self?.collectionView.setNeedsLayout()
+			}
+		}
+	}
+
 	override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
+
+		self.lastVisibleIndexPath = collectionView.indexPathsForVisibleItems.first
+
         if UIDevice.current.orientation.isLandscape {
-            // Landscape
 			setGridLayout(columns: 3)
         } else {
-			// Portrait
             setGridLayout(columns: 2)
         }
+
+
+
     }
 
 	func setGridLayout(columns: Int) {
@@ -46,7 +67,6 @@ class TrendingGifsViewController: UIViewController {
 		collectionView.collectionViewLayout = layout
 		layout.delegate = self
 		layout.cellsPadding = ItemsPadding(horizontal: 8, vertical: 8)
-		collectionView.reloadData()
 	}
 
 	required init?(coder: NSCoder) {
@@ -58,9 +78,6 @@ class TrendingGifsViewController: UIViewController {
 		
 		collectionView.register(ContentCell.self,
 								forCellWithReuseIdentifier: "ContentCell")
-		collectionView.register(HeaderView.self,
-								forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-								withReuseIdentifier: "HeaderViewIdentifier")
 		collectionView.register(FooterView.self,
 								forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
 								withReuseIdentifier: "FooterViewIdentifier")
@@ -78,52 +95,43 @@ class TrendingGifsViewController: UIViewController {
 		// try the appending.
 		viewModel.newItems = { [weak self] gifs in
 			guard let self = self else { return }
-
-			// using collection diffing (Swift 5.1) to optimize reloads
-			if let storedItems = self.gifItems {
-				let diff = gifs.difference(from: storedItems)
-				let toRemove = diff.removals.compactMap { change -> IndexPath? in
-					switch change {
-					case let .remove(offset, _, _): return IndexPath(row: offset, section: 0)
-					default: return nil
-					}
-				}
-				let toInsert = diff.insertions.compactMap { change -> IndexPath? in
-					switch change {
-					case let .insert(offset, _, _): return IndexPath(row: offset, section: 0)
-					default: return nil
-					}
-				}
-
-				self.collectionViewProvider.items = [gifs]
-				self.collectionViewProvider.supplementaryItems = [""]
-				self.prepareCellSizes()
-
-				self.collectionView.performBatchUpdates({
-					self.collectionView.deleteItems(at: toRemove)
-					self.collectionView.insertItems(at: toInsert)
-				}, completion: { (success) in
-					print("success: \(success)")
-				})
-			} else {
-				// initially empty
-				self.collectionViewProvider.items = [[]] // give first section
-				self.collectionViewProvider.supplementaryItems = [""]
-				self.prepareCellSizes()
-				self.collectionView.reloadData()
-			}
+			self.updateWithNewItems(gifs)
 		}
 	}
 
-	private var gifItems: [GifObject]? {
-		return  self.collectionViewProvider.items.first
+	private func updateWithNewItems(_ items: [GifObject]) {
+		// using collection diffing to optimize reloads
+		guard let currItems = self.collectionViewProvider.items.first else { return }
+
+		let diff = items.difference(from: currItems)
+
+		let toRemove = diff.removals.compactMap { change -> IndexPath? in
+			guard case let .remove(offset, _, _) = change else {
+				return nil
+			}
+			return IndexPath(row: offset, section: 0)
+		}
+
+		let toInsert = diff.insertions.compactMap { change -> IndexPath? in
+			guard case let .insert(offset, _, _) = change else {
+				return nil
+			}
+			return IndexPath(row: offset, section: 0)
+		}
+
+		collectionView.performBatchUpdates({ [weak self] in
+			self?.collectionViewProvider.items = [items]
+			self?.prepareCellSizes()
+			self?.collectionView.deleteItems(at: toRemove)
+			self?.collectionView.insertItems(at: toInsert)
+		})
 	}
 
 	private func setupCollectionView() {
 		collectionView.dataSource = collectionViewProvider
 		collectionView.delegate = self
-		collectionViewProvider.items = []
-		collectionViewProvider.supplementaryItems = []
+		collectionViewProvider.items = [[]]
+		collectionViewProvider.supplementaryItems = [""]
 
 		setGridLayout(columns: 2)
 	}
@@ -151,20 +159,23 @@ extension TrendingGifsViewController: UICollectionViewDelegate {
 		viewModel.selectedGif?(gifObject)
 	}
 
+	// will trigger a next page fetch from the API
 	func collectionView(_ collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, at indexPath: IndexPath) {
 
 		guard elementKind == UICollectionView.elementKindSectionFooter else { return }
+
+		// no fetching until you reached end of a populated list
+		guard let gifs = collectionViewProvider.items.first, gifs.count > 0 else { return }
 
 		let elementCount = collectionViewProvider.items
 			.flatMap { $0 }
 			.count
 
 		viewModel.getGifs(offset: elementCount) { [weak self] gifs in
-			guard let self = self else { return }
-			guard let firstSection = self.collectionViewProvider.items.first else { return }
-			self.collectionViewProvider.items = [firstSection + gifs]
-			self.prepareCellSizes() // recomputing old objects
-			self.collectionView.reloadData()
+			guard let self = self,
+				let existingItems = self.collectionViewProvider.items.first else { return }
+
+			self.updateWithNewItems(existingItems + gifs)
 		}
 	}
 }
@@ -180,19 +191,7 @@ extension TrendingGifsViewController: LayoutDelegate {
 
 	func footerHeight(indexPath: IndexPath) -> CGFloat {
 		let sectionsCount = collectionViewProvider.supplementaryItems.count
-		return (indexPath.section == sectionsCount - 1) ? 24 : 0
-	}
-}
-
-extension CGFloat {
-	static func random() -> CGFloat {
-		return CGFloat(arc4random()) / CGFloat(UInt32.max)
-	}
-}
-
-extension UIColor {
-	static func random() -> UIColor {
-		return UIColor(red: .random(), green: .random(), blue: .random(), alpha: 1.0)
+		return (indexPath.section == sectionsCount - 1) ? CGFloat.leastNonzeroMagnitude : 0
 	}
 }
 
