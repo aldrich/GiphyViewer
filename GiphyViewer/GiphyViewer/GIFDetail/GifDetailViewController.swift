@@ -8,13 +8,13 @@
 
 import UIKit
 import SnapKit
-import Gifu
+import SwiftyGif
 
 class GifDetailViewController: UIViewController {
 
 	private let viewModel: GifDetailViewModel
 
-	let imageView = GIFImageView()
+	let imageView = UIImageView()
 
 	init(viewModel: GifDetailViewModel) {
 		self.viewModel = viewModel
@@ -33,7 +33,6 @@ class GifDetailViewController: UIViewController {
 		view.addSubview(imageView)
 
 		if let size = viewModel.gif.sizeFullScreenImage {
-
 			imageView.snp.makeConstraints { make in
 				make.center.equalToSuperview()
 				make.top.leading.greaterThanOrEqualTo(10)
@@ -45,7 +44,7 @@ class GifDetailViewController: UIViewController {
 		}
 
 		if let url = viewModel.gif.urlFullScreenImage {
-			imageView.animate(withGIFURL: url)
+			imageView.setGifFromURL(url)
 		}
     }
 }

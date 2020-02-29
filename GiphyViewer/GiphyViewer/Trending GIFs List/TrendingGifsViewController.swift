@@ -14,17 +14,11 @@ class TrendingGifsViewController: UIViewController {
 	private var cellSizes = [[CGSize]]()
 	
 	private let viewModel: TrendingGifsViewModel
-	private let collectionViewProvider = CollectionViewProvider()	
 
-	// used to record scroll position when switching orientation
-	private var lastVisibleIndexPath: IndexPath?
+	private let collectionViewProvider = TrendingGifsCollectionViewProvider()
 
-	let collectionView: UICollectionView = {
-		let layout = UICollectionViewFlowLayout()
-		let collVw = UICollectionView(frame: .zero,
-									  collectionViewLayout: layout)
-		return collVw
-	}()
+	private let collectionView = UICollectionView(frame: .zero,
+												  collectionViewLayout: UICollectionViewFlowLayout())
 	
 	init(viewModel: TrendingGifsViewModel) {
 		self.viewModel = viewModel
@@ -32,33 +26,13 @@ class TrendingGifsViewController: UIViewController {
 		self.title = "Trending"
 	}
 
-	override func viewWillLayoutSubviews() {
-		super.viewWillLayoutSubviews()
-
-		DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-			if let lastVisibleIndexPath = self?.lastVisibleIndexPath {
-				self?.collectionView.scrollToItem(at: lastVisibleIndexPath,
-												  at: .top,
-												  animated: false)
-				print("scroll to \(lastVisibleIndexPath.row)")
-				self?.collectionView.setNeedsLayout()
-			}
-		}
-	}
-
 	override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-
-		self.lastVisibleIndexPath = collectionView.indexPathsForVisibleItems.first
-
         if UIDevice.current.orientation.isLandscape {
 			setGridLayout(columns: 3)
         } else {
             setGridLayout(columns: 2)
         }
-
-
-
     }
 
 	func setGridLayout(columns: Int) {
@@ -171,7 +145,7 @@ extension TrendingGifsViewController: UICollectionViewDelegate {
 			.flatMap { $0 }
 			.count
 
-		viewModel.getGifs(offset: elementCount) { [weak self] gifs in
+		viewModel.getGifObjects(offset: elementCount) { [weak self] gifs in
 			guard let self = self,
 				let existingItems = self.collectionViewProvider.items.first else { return }
 

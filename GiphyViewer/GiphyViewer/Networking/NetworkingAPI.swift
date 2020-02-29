@@ -1,5 +1,5 @@
 //
-//  Networking2.swift
+//  NetworkingAPI.swift
 //  GiphyViewer
 //
 //  Created by Aldrich Co on 2/29/20.
@@ -10,60 +10,61 @@ import Foundation
 
 class NetworkingAPI: NSObject {
 
-	typealias CompletionBlock = ([GifObject], Int) -> Void
+	typealias CompletionBlock = ([GifObject]) -> Void
 
 	static let queue: OperationQueue = {
 		let queue = OperationQueue()
-		queue.maxConcurrentOperationCount = 1 // they are fetched sequentially
+		queue.maxConcurrentOperationCount = 1
 		return queue
 	}()
 
-	private static let key = "DezIty95T3a2Camo3xwe79KxFlKYN5Lz"
+	enum Constants {
+		static let apiKey = "DezIty95T3a2Camo3xwe79KxFlKYN5Lz"
+		static let urlStrFormat = "https://api.giphy.com/v1/gifs/trending?api_key=%@&offset=%d&limit=%d"
+		static let limit = 25
+	}
 
-	static var operation: Operation!
-
-	class func getTrendingGifs(offset: Int, limit: Int = 25, completion: @escaping CompletionBlock) {
+	class func getTrendingGifs(offset: Int, limit: Int = Constants.limit,
+							   completion: @escaping CompletionBlock) {
 
 		let session = URLSession(configuration: .default)
-		let url = URL(string: "https://api.giphy.com/v1/gifs/trending?api_key=\(key)&offset=\(offset)&limit=\(limit)")!
+		let urlString = String(format: Constants.urlStrFormat, Constants.apiKey, offset, limit)
+		let url = URL(string: urlString)!
 		let request = URLRequest(url: url)
 
-		let operation = FetchOperation(session: session, request: request, completion: { (data, response, error) -> Void in
+		let operation = DataFetchOperation(session: session, request: request,
+									   completion: { (data, response, error) -> Void in
 			DispatchQueue.main.async {
 				do {
 					if let data = data {
 						let decoder = JSONDecoder()
 						decoder.keyDecodingStrategy = .convertFromSnakeCase
-
 						let response = try decoder.decode(GetTrendingImagesResponse.self, from: data)
-						completion(response.data, offset) // Good
+						let gifs = response.data
+						completion(gifs)
 					}
 				} catch {
-					print(error) // decoding error likely.
-					completion([], offset) // Bad
+					print(error)
+					completion([])
 				}
 			}
-		}, offset: offset)
-
+		})
 		queue.addOperation(operation)
 	}
 }
 
-class FetchOperation: Operation {
-
-	var offset: Int?
+class DataFetchOperation: Operation {
 
 	var task: URLSessionTask?
 
 	init(session: URLSession, request: URLRequest,
-		 completion: @escaping ((_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void), offset: Int) {
+		 completion: @escaping ((_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void)) {
 		super.init()
 		self.task = session.dataTask(with: request, completionHandler: { [weak self] data, response, error in
 			completion(data, response, error)
 			self?.executing(false)
 			self?.finish(true)
 		})
-		self.offset = offset
 	}
 
 	override var isFinished: Bool {
@@ -102,7 +103,6 @@ class FetchOperation: Operation {
 	}
 
 	override func start() {
-		// let url = task?.currentRequest?.url
 		task!.resume()
 	}
 
@@ -115,5 +115,4 @@ class FetchOperation: Operation {
 struct GetTrendingImagesResponse: Decodable {
 	let data: [GifObject]
 	let pagination: ResponsePagination
-	// meta not used
 }

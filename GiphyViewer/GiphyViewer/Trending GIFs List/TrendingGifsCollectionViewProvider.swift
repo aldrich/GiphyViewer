@@ -1,5 +1,5 @@
 //
-//  CollectionViewDataProvider.swift
+//  TrendingGifsCollectionViewProvider.swift
 //  GiphyViewer
 //
 //  Created by Aldrich Co on 2/28/20.
@@ -8,11 +8,11 @@
 
 import UIKit
 
-class CollectionViewProvider: NSObject, UICollectionViewDataSource {
+class TrendingGifsCollectionViewProvider: NSObject, UICollectionViewDataSource {
 	
 	var items = [[GifObject]]()
 	var supplementaryItems = [String]()
-	
+
 	func numberOfSections(in collectionView: UICollectionView) -> Int {
 		return supplementaryItems.count
 	}
