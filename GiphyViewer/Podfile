@@ -7,7 +7,6 @@ target 'GiphyViewer' do
 	# Pods for GiphyViewer
 	pod 'SnapKit'
 	pod 'SwiftyGif'
-	pod 'SkeletonView'
 
 	target 'GiphyViewerTests' do
 		inherit! :search_paths
