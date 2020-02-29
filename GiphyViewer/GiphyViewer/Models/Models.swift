@@ -33,11 +33,11 @@ struct ResponsePagination: Decodable {
 }
 
 struct UserObject: Decodable {
-
+	// TODO: fill in user object
 }
 
-// REF: https://developers.giphy.com/docs/api/schema#image-object
 struct ImageObject: Decodable {
+	// Ref: https://developers.giphy.com/docs/api/schema#image-object
 	let frames: String?
 	let hash: String?
 	let height: String?

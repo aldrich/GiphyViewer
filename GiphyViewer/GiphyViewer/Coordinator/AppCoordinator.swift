@@ -25,11 +25,12 @@ class AppCoordinator: BaseCoordinator {
 	private func showGifList() {
 		self.removeChildCoordinators()
 
-		let viewModel = ViewModel() // use dependency injection
-		let coordinator = GifListCoordinator(viewModel: viewModel)
+		let viewModel = TrendingGifsViewModel() // use dependency injection
+		let coordinator = TrendingGifsListCoordinator(viewModel: viewModel)
 			// AppDelegate.container.resolve(DrawerMenuCoordinator.self)!
 
 		coordinator.navigationController = UINavigationController() // BaseNavigationController()
+
 
 		self.start(coordinator: coordinator)
 
@@ -38,4 +39,5 @@ class AppCoordinator: BaseCoordinator {
 			viewController: coordinator.navigationController,
 			withAnimation: true)
 	}
+
 }

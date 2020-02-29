@@ -14,7 +14,7 @@ class TrendingGifsViewController: UIViewController {
 	
 	private var cellSizes = [[CGSize]]()
 	
-	private let viewModel: ViewModel
+	private let viewModel: TrendingGifsViewModel
 	private let collectionViewProvider = CollectionViewProvider()	
 	
 	let collectionView: UICollectionView = {
@@ -24,7 +24,7 @@ class TrendingGifsViewController: UIViewController {
 		return collVw
 	}()
 	
-	init(viewModel: ViewModel) {
+	init(viewModel: TrendingGifsViewModel) {
 		self.viewModel = viewModel
 		super.init(nibName: nil, bundle: nil)
 	}
@@ -67,6 +67,7 @@ class TrendingGifsViewController: UIViewController {
 	
 	private func setupCollectionView() {
 		collectionView.dataSource = collectionViewProvider
+		collectionView.delegate = self
 		collectionViewProvider.items = []
 		collectionViewProvider.supplementaryItems = []
 		let layout = GridLayout()
@@ -91,11 +92,19 @@ class TrendingGifsViewController: UIViewController {
 	}
 }
 
+extension TrendingGifsViewController: UICollectionViewDelegate {
+
+	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+		let gifObject = self.collectionViewProvider.items[indexPath.section][indexPath.row]
+		viewModel.selectedGif?(gifObject)
+	}
+}
+
 extension TrendingGifsViewController: LayoutDelegate {
 	func cellSize(indexPath: IndexPath) -> CGSize {
 		return cellSizes[indexPath.section][indexPath.row]
 	}
-	
+
 	func headerHeight(indexPath: IndexPath) -> CGFloat {
         return 12
     }

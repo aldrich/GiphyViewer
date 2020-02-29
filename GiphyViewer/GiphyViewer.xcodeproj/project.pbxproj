@@ -16,15 +16,17 @@
 		BE363517240913D80099D591 /* GiphyViewerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE363516240913D80099D591 /* GiphyViewerUITests.swift */; };
 		BEBB7989240A0FA1002375AE /* Networking.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBB797B240A0FA1002375AE /* Networking.swift */; };
 		BEBB798A240A0FA1002375AE /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBB797D240A0FA1002375AE /* AppCoordinator.swift */; };
-		BEBB798B240A0FA1002375AE /* GifListCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBB797E240A0FA1002375AE /* GifListCoordinator.swift */; };
+		BEBB798B240A0FA1002375AE /* TrendingGifsListCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBB797E240A0FA1002375AE /* TrendingGifsListCoordinator.swift */; };
 		BEBB798C240A0FA1002375AE /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBB797F240A0FA1002375AE /* Coordinator.swift */; };
 		BEBB798D240A0FA1002375AE /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBB7981240A0FA1002375AE /* Models.swift */; };
 		BEBB798E240A0FA1002375AE /* CollectionViewDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBB7983240A0FA1002375AE /* CollectionViewDataProvider.swift */; };
 		BEBB798F240A0FA1002375AE /* GridLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBB7984240A0FA1002375AE /* GridLayout.swift */; };
-		BEBB7990240A0FA1002375AE /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBB7985240A0FA1002375AE /* ViewModel.swift */; };
+		BEBB7990240A0FA1002375AE /* TrendingGifsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBB7985240A0FA1002375AE /* TrendingGifsViewModel.swift */; };
 		BEBB7991240A0FA1002375AE /* TrendingGifsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBB7986240A0FA1002375AE /* TrendingGifsViewController.swift */; };
 		BEBB7992240A0FA1002375AE /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBB7987240A0FA1002375AE /* Views.swift */; };
 		BEBB7993240A0FA1002375AE /* BaseLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBB7988240A0FA1002375AE /* BaseLayout.swift */; };
+		BEBB7997240A108A002375AE /* GifDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBB7996240A108A002375AE /* GifDetailViewController.swift */; };
+		BEBB7999240A109B002375AE /* GifDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBB7998240A109B002375AE /* GifDetailViewModel.swift */; };
 		F8F46FCA8BAE72463CA65F71 /* Pods_GiphyViewer_GiphyViewerUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E223BFBD8142154C34EB1F5 /* Pods_GiphyViewer_GiphyViewerUITests.framework */; };
 /* End PBXBuildFile section */
 
@@ -66,15 +68,17 @@
 		BE363518240913D80099D591 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BEBB797B240A0FA1002375AE /* Networking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Networking.swift; sourceTree = "<group>"; };
 		BEBB797D240A0FA1002375AE /* AppCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
-		BEBB797E240A0FA1002375AE /* GifListCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GifListCoordinator.swift; sourceTree = "<group>"; };
+		BEBB797E240A0FA1002375AE /* TrendingGifsListCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrendingGifsListCoordinator.swift; sourceTree = "<group>"; };
 		BEBB797F240A0FA1002375AE /* Coordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
 		BEBB7981240A0FA1002375AE /* Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		BEBB7983240A0FA1002375AE /* CollectionViewDataProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionViewDataProvider.swift; sourceTree = "<group>"; };
 		BEBB7984240A0FA1002375AE /* GridLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GridLayout.swift; sourceTree = "<group>"; };
-		BEBB7985240A0FA1002375AE /* ViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
+		BEBB7985240A0FA1002375AE /* TrendingGifsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrendingGifsViewModel.swift; sourceTree = "<group>"; };
 		BEBB7986240A0FA1002375AE /* TrendingGifsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrendingGifsViewController.swift; sourceTree = "<group>"; };
 		BEBB7987240A0FA1002375AE /* Views.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Views.swift; sourceTree = "<group>"; };
 		BEBB7988240A0FA1002375AE /* BaseLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseLayout.swift; sourceTree = "<group>"; };
+		BEBB7996240A108A002375AE /* GifDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GifDetailViewController.swift; sourceTree = "<group>"; };
+		BEBB7998240A109B002375AE /* GifDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GifDetailViewModel.swift; sourceTree = "<group>"; };
 		E8A742623B1B353FCD5E8FDD /* Pods-GiphyViewerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GiphyViewerTests.debug.xcconfig"; path = "Target Support Files/Pods-GiphyViewerTests/Pods-GiphyViewerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ED4B114DC6289DCA3F022E3F /* Pods_GiphyViewer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GiphyViewer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -176,6 +180,8 @@
 		BEBB7979240A0FA1002375AE /* GIFDetail */ = {
 			isa = PBXGroup;
 			children = (
+				BEBB7996240A108A002375AE /* GifDetailViewController.swift */,
+				BEBB7998240A109B002375AE /* GifDetailViewModel.swift */,
 			);
 			path = GIFDetail;
 			sourceTree = "<group>";
@@ -192,7 +198,7 @@
 			isa = PBXGroup;
 			children = (
 				BEBB797D240A0FA1002375AE /* AppCoordinator.swift */,
-				BEBB797E240A0FA1002375AE /* GifListCoordinator.swift */,
+				BEBB797E240A0FA1002375AE /* TrendingGifsListCoordinator.swift */,
 				BEBB797F240A0FA1002375AE /* Coordinator.swift */,
 			);
 			path = Coordinator;
@@ -211,7 +217,7 @@
 			children = (
 				BEBB7983240A0FA1002375AE /* CollectionViewDataProvider.swift */,
 				BEBB7984240A0FA1002375AE /* GridLayout.swift */,
-				BEBB7985240A0FA1002375AE /* ViewModel.swift */,
+				BEBB7985240A0FA1002375AE /* TrendingGifsViewModel.swift */,
 				BEBB7986240A0FA1002375AE /* TrendingGifsViewController.swift */,
 				BEBB7987240A0FA1002375AE /* Views.swift */,
 				BEBB7988240A0FA1002375AE /* BaseLayout.swift */,
@@ -472,15 +478,17 @@
 			files = (
 				BEBB798A240A0FA1002375AE /* AppCoordinator.swift in Sources */,
 				BEBB7992240A0FA1002375AE /* Views.swift in Sources */,
-				BEBB7990240A0FA1002375AE /* ViewModel.swift in Sources */,
-				BEBB798B240A0FA1002375AE /* GifListCoordinator.swift in Sources */,
+				BEBB7990240A0FA1002375AE /* TrendingGifsViewModel.swift in Sources */,
+				BEBB798B240A0FA1002375AE /* TrendingGifsListCoordinator.swift in Sources */,
 				BEBB7993240A0FA1002375AE /* BaseLayout.swift in Sources */,
 				BEBB798C240A0FA1002375AE /* Coordinator.swift in Sources */,
 				BEBB7991240A0FA1002375AE /* TrendingGifsViewController.swift in Sources */,
 				BEBB798E240A0FA1002375AE /* CollectionViewDataProvider.swift in Sources */,
 				BEBB798D240A0FA1002375AE /* Models.swift in Sources */,
 				BE3634F5240913D60099D591 /* AppDelegate.swift in Sources */,
+				BEBB7999240A109B002375AE /* GifDetailViewModel.swift in Sources */,
 				BEBB7989240A0FA1002375AE /* Networking.swift in Sources */,
+				BEBB7997240A108A002375AE /* GifDetailViewController.swift in Sources */,
 				BEBB798F240A0FA1002375AE /* GridLayout.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

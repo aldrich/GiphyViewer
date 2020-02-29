@@ -8,7 +8,10 @@
 
 import Foundation
 
-class ViewModel {
+class TrendingGifsViewModel {
+
+	var selectedGif: ((GifObject) -> Void)?
+
 	private let networking = NetworkingApi()
 
 	var newItems: (([GifObject]) -> Void)?
