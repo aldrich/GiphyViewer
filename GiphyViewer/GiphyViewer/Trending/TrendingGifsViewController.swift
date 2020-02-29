@@ -44,7 +44,7 @@ class TrendingGifsViewController: UIViewController {
 		collectionView.register(FooterView.self,
 								forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
 								withReuseIdentifier: "FooterViewIdentifier")
-		
+
 		view.addSubview(collectionView)
 		collectionView.snp.makeConstraints { make in
 			make.edges.equalToSuperview()
@@ -55,7 +55,7 @@ class TrendingGifsViewController: UIViewController {
 		prepareCellSizes()
 		
 		collectionView.reloadData()
-		
+
 		// try the appending.
 		viewModel.newItems = { [weak self] gifs in
 			self?.collectionViewProvider.items = [gifs] // give first section
@@ -93,20 +93,20 @@ class TrendingGifsViewController: UIViewController {
 }
 
 extension TrendingGifsViewController: UICollectionViewDelegate {
-	
+
 	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 		let gifObject = self.collectionViewProvider.items[indexPath.section][indexPath.row]
 		viewModel.selectedGif?(gifObject)
 	}
-	
+
 	func collectionView(_ collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, at indexPath: IndexPath) {
-		
+
 		guard elementKind == UICollectionView.elementKindSectionFooter else { return }
-		
+
 		let elementCount = collectionViewProvider.items
 			.flatMap { $0 }
 			.count
-		
+
 		viewModel.getGifs(offset: elementCount) { [weak self] gifs in
 			self?.collectionViewProvider.items.append(gifs)
 			self?.collectionViewProvider.supplementaryItems.append("ii")
@@ -120,11 +120,11 @@ extension TrendingGifsViewController: LayoutDelegate {
 	func cellSize(indexPath: IndexPath) -> CGSize {
 		return cellSizes[indexPath.section][indexPath.row]
 	}
-	
+
 	func headerHeight(indexPath: IndexPath) -> CGFloat {
 		return 0
 	}
-	
+
 	func footerHeight(indexPath: IndexPath) -> CGFloat {
 		let sectionsCount = collectionViewProvider.supplementaryItems.count
 		return (indexPath.section == sectionsCount - 1) ? 24 : 0
@@ -151,7 +151,7 @@ extension GifObject {
 		}
 		return nil
 	}
-	
+
 	var heightFixedWidth: CGFloat? {
 		if let heightStr = fixedWidthDownsampledImage?.height,
 			let floatValue = NumberFormatter().number(from: heightStr)?.floatValue {
@@ -159,8 +159,29 @@ extension GifObject {
 		}
 		return nil
 	}
-	
+
 	var fixedWidthDownsampledImage: ImageObject? {
 		return images["fixed_width_downsampled"]
+	}
+
+	var fullScreenImage: ImageObject? {
+		return images["original"]
+	}
+
+	var urlFullScreenImage: URL? {
+		if let url = fullScreenImage?.url {
+			return URL(string: url)
+		}
+		return nil
+	}
+
+	var sizeFullScreenImage: CGSize? {
+		if let widthStr = fullScreenImage?.width,
+			let heightStr = fullScreenImage?.height,
+			let width = Int(widthStr),
+			let height = Int(heightStr) {
+			return CGSize(width: width, height: height)
+		}
+		return nil
 	}
 }

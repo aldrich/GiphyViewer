@@ -18,7 +18,7 @@ class TrendingGifsListCoordinator: BaseCoordinator {
 		super.init()
 
 		viewModel.selectedGif = { [weak self] gifObject in
-			self?.showDetail()
+			self?.showDetail(gif: gifObject)
 		}
 	}
 
@@ -28,8 +28,8 @@ class TrendingGifsListCoordinator: BaseCoordinator {
         self.navigationController.viewControllers = [viewController]
     }
 
-	private func showDetail() {
-		let viewModel = GifDetailViewModel()
+	private func showDetail(gif: GifObject) {
+		let viewModel = GifDetailViewModel(gif: gif)
 		let viewController = GifDetailViewController(viewModel: viewModel)
 		self.navigationController.pushViewController(viewController, animated: true)
 	}

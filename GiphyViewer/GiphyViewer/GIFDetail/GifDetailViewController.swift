@@ -7,10 +7,18 @@
 //
 
 import UIKit
+import SnapKit
+import SwiftyGif
 
 class GifDetailViewController: UIViewController {
 
 	private let viewModel: GifDetailViewModel
+
+	let imageView: UIImageView = {
+		let ret = UIImageView()
+		return ret
+	}()
+
 
 	init(viewModel: GifDetailViewModel) {
 		self.viewModel = viewModel
@@ -24,7 +32,24 @@ class GifDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-		view.backgroundColor = .magenta
-    }
+		view.backgroundColor = .black
 
+		view.addSubview(imageView)
+
+		if let size = viewModel.gif.sizeFullScreenImage {
+
+			imageView.snp.makeConstraints { make in
+				make.center.equalToSuperview()
+				make.top.leading.greaterThanOrEqualTo(10)
+				make.bottom.trailing.lessThanOrEqualTo(10)
+				make.width.equalTo(imageView.snp.height).multipliedBy(size.width / size.height)
+				make.width.height.equalToSuperview().priority(.high)
+				make.height.lessThanOrEqualTo(size.height)
+			}
+		}
+
+		if let url = viewModel.gif.urlFullScreenImage {
+			imageView.setGifFromURL(url)
+		}
+    }
 }

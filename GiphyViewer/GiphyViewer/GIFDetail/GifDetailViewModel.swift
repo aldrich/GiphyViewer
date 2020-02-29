@@ -9,13 +9,9 @@
 import Foundation
 
 class GifDetailViewModel {
-//	private let networking = NetworkingApi()
-//
-//	var newItems: (([GifObject]) -> Void)?
 
-	init() {
-//		networking.getTrendingGifs { [weak self] gifs in
-//			self?.newItems?(gifs)
-//		}
+	let gif: GifObject
+	init(gif: GifObject) {
+		self.gif = gif
 	}
 }
