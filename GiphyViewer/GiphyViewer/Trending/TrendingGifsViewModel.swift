@@ -12,19 +12,29 @@ class TrendingGifsViewModel {
 
 	var selectedGif: ((GifObject) -> Void)?
 
-	private let networking = NetworkingApi()
-
 	var newItems: (([GifObject]) -> Void)?
 
+	var results = [Int: [GifObject]]()
+
 	init() {
-		getGifs(offset: 0) { [weak self] gifs in
-			self?.newItems?(gifs)
+		// initial load pages 0 to 24 (25 items each)
+		(0...24).forEach { index in
+			NetworkingAPI.getTrendingGifs(offset: index * 25, limit: 25) { [weak self] gifs, offset in
+				guard let self = self else { return }
+				self.results[index] = gifs
+				let res = self.flattenedGifsResults
+				self.newItems?(res)
+			}
 		}
 	}
 
 	func getGifs(offset: Int = 0, complete: @escaping (([GifObject]) -> Void)) {
-		self.networking.getTrendingGifs(offset: offset) { gifs in
+		NetworkingAPI.getTrendingGifs(offset: offset) { gifs, offset in
 			complete(gifs)
 		}
+	}
+
+	private var flattenedGifsResults: [GifObject] {
+		return results.sorted { $0.key < $1.key }.flatMap { $0.value }
 	}
 }

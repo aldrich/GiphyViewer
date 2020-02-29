@@ -49,3 +49,15 @@ struct ImageObject: Decodable {
 	let webpSize: String?
 	let width: String?
 }
+
+extension GifObject: Equatable {
+	static func == (lhs: GifObject, rhs: GifObject) -> Bool {
+		return lhs.id == rhs.id
+	}
+}
+
+extension GifObject: CustomDebugStringConvertible {
+	var debugDescription: String {
+		return self.title
+	}
+}

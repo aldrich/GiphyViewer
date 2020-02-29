@@ -53,18 +53,52 @@ class TrendingGifsViewController: UIViewController {
 		collectionView.backgroundColor = .black
 		setupCollectionView()
 		prepareCellSizes()
-		
 		collectionView.reloadData()
 
 		// try the appending.
 		viewModel.newItems = { [weak self] gifs in
-			self?.collectionViewProvider.items = [gifs] // give first section
-			self?.collectionViewProvider.supplementaryItems = ["i"]
-			self?.prepareCellSizes()
-			self?.collectionView.reloadData()
+			guard let self = self else { return }
+
+			// using collection diffing (Swift 5.1) to optimize reloads
+			if let storedItems = self.gifItems {
+				let diff = gifs.difference(from: storedItems)
+				let toRemove = diff.removals.compactMap { change -> IndexPath? in
+					switch change {
+					case let .remove(offset, _, _): return IndexPath(row: offset, section: 0)
+					default: return nil
+					}
+				}
+				let toInsert = diff.insertions.compactMap { change -> IndexPath? in
+					switch change {
+					case let .insert(offset, _, _): return IndexPath(row: offset, section: 0)
+					default: return nil
+					}
+				}
+
+				self.collectionViewProvider.items = [gifs]
+				self.collectionViewProvider.supplementaryItems = [""]
+				self.prepareCellSizes()
+
+				self.collectionView.performBatchUpdates({
+					self.collectionView.deleteItems(at: toRemove)
+					self.collectionView.insertItems(at: toInsert)
+				}, completion: { (success) in
+					print("success: \(success)")
+				})
+			} else {
+				// initially empty
+				self.collectionViewProvider.items = [[]] // give first section
+				self.collectionViewProvider.supplementaryItems = [""]
+				self.prepareCellSizes()
+				self.collectionView.reloadData()
+			}
 		}
 	}
-	
+
+	private var gifItems: [GifObject]? {
+		return  self.collectionViewProvider.items.first
+	}
+
 	private func setupCollectionView() {
 		collectionView.dataSource = collectionViewProvider
 		collectionView.delegate = self
@@ -108,10 +142,11 @@ extension TrendingGifsViewController: UICollectionViewDelegate {
 			.count
 
 		viewModel.getGifs(offset: elementCount) { [weak self] gifs in
-			self?.collectionViewProvider.items.append(gifs)
-			self?.collectionViewProvider.supplementaryItems.append("ii")
-			self?.prepareCellSizes() // recomputing old objects
-			self?.collectionView.reloadData()
+			guard let self = self else { return }
+			guard let firstSection = self.collectionViewProvider.items.first else { return }
+			self.collectionViewProvider.items = [firstSection + gifs]
+			self.prepareCellSizes() // recomputing old objects
+			self.collectionView.reloadData()
 		}
 	}
 }
