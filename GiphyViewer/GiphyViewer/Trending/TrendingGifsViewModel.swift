@@ -17,8 +17,14 @@ class TrendingGifsViewModel {
 	var newItems: (([GifObject]) -> Void)?
 
 	init() {
-		networking.getTrendingGifs { [weak self] gifs in
+		getGifs(offset: 0) { [weak self] gifs in
 			self?.newItems?(gifs)
+		}
+	}
+
+	func getGifs(offset: Int = 0, complete: @escaping (([GifObject]) -> Void)) {
+		self.networking.getTrendingGifs(offset: offset) { gifs in
+			complete(gifs)
 		}
 	}
 }

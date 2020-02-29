@@ -148,7 +148,6 @@
 			children = (
 				BEBB797C240A0FA1002375AE /* Coordinator */,
 				BEBB7979240A0FA1002375AE /* GIFDetail */,
-				BEBB7980240A0FA1002375AE /* Models */,
 				BEBB797A240A0FA1002375AE /* Networking */,
 				BEBB7982240A0FA1002375AE /* Trending */,
 				BE3634F4240913D60099D591 /* AppDelegate.swift */,
@@ -219,6 +218,7 @@
 				BEBB7984240A0FA1002375AE /* GridLayout.swift */,
 				BEBB7985240A0FA1002375AE /* TrendingGifsViewModel.swift */,
 				BEBB7986240A0FA1002375AE /* TrendingGifsViewController.swift */,
+				BEBB7980240A0FA1002375AE /* Models */,
 				BEBB7987240A0FA1002375AE /* Views.swift */,
 				BEBB7988240A0FA1002375AE /* BaseLayout.swift */,
 			);

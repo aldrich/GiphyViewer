@@ -7,12 +7,13 @@
 //
 
 import UIKit
+import SwiftyGif
 
 class ContentCell: UICollectionViewCell {
 
 	override func prepareForReuse() {
 		super.prepareForReuse()
-		imageView.image = nil
+		imageView.clear()
 		label.text = nil
 	}
 
@@ -33,10 +34,11 @@ class ContentCell: UICollectionViewCell {
 	func populate(with item: GifObject) {
 		backgroundColor = UIColor.random()
 			.withAlphaComponent(0.5)
-		label.text = item.title
-
+		label.text = "" // item.title
 		if let url = item.urlFixedWidth {
-			imageView.setGifFromURL(url)
+			imageView.setGifFromURL(url, levelOfIntegrity: .lowForTooManyGifs)
+		} else {
+			print()
 		}
 	}
 
@@ -84,11 +86,11 @@ class HeaderView: UICollectionReusableView {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-    func populate(with item: String) {
-        label.text = item
+	func populate(with item: String) {
+		label.text = item
 
-        backgroundColor = UIColor.random().withAlphaComponent(0.5)
-    }
+		backgroundColor = UIColor.random().withAlphaComponent(0.5)
+	}
 }
 
 class FooterView: UICollectionReusableView {
@@ -115,8 +117,22 @@ class FooterView: UICollectionReusableView {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-    func populate(with item: String) {
-        label.text = item
-        backgroundColor = UIColor.random().withAlphaComponent(0.5)
-    }
+	func populate(with item: String) {
+		label.text = item
+		backgroundColor = UIColor.random().withAlphaComponent(0.5)
+	}
+}
+
+public extension UIImage {
+	convenience init?(color: UIColor, size: CGSize = CGSize(width: 1, height: 1)) {
+		let rect = CGRect(origin: .zero, size: size)
+		UIGraphicsBeginImageContextWithOptions(rect.size, false, 0.0)
+		color.setFill()
+		UIRectFill(rect)
+		let image = UIGraphicsGetImageFromCurrentImageContext()
+		UIGraphicsEndImageContext()
+
+		guard let cgImage = image?.cgImage else { return nil }
+		self.init(cgImage: cgImage)
+	}
 }

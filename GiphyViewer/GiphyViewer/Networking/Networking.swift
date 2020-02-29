@@ -8,25 +8,23 @@
 
 import Foundation
 
-protocol NetworkingService {
-	@discardableResult func getTrendingGifs(completion: @escaping ([GifObject]) -> Void) -> URLSessionDataTask
-}
+//protocol NetworkingService {
+//	@discardableResult func getTrendingGifs(limit: Int,
+//											completion: @escaping ([GifObject]) -> Void) -> URLSessionDataTask
+//}
 
-final class NetworkingApi: NetworkingService {
+final class NetworkingApi {
 	private let session = URLSession.shared
 	private let key = "DezIty95T3a2Camo3xwe79KxFlKYN5Lz"
 
-//	https://api.giphy.com/v1/gifs/trending?api_key=DezIty95T3a2Camo3xwe79KxFlKYN5Lz&limit=25&rating=G
 	@discardableResult
-	func getTrendingGifs(completion: @escaping ([GifObject]) -> Void) -> URLSessionDataTask {
-		let request = URLRequest(url: URL(string: "https://api.giphy.com/v1/gifs/trending?api_key=\(key)&limit=25&rating=G")!)
+	func getTrendingGifs(offset: Int = 0, limit: Int = 50,
+						 completion: @escaping ([GifObject]) -> Void) -> URLSessionDataTask {
+		let request = URLRequest(url: URL(string: "https://api.giphy.com/v1/gifs/trending?api_key=\(key)&offset=\(offset)&limit=\(limit)")!)
 		let task = session.dataTask(with: request) { (data, _, _) in
 			DispatchQueue.main.async {
 				let decoder = JSONDecoder()
 				decoder.keyDecodingStrategy = .convertFromSnakeCase
-//				let dateFormatter = DateFormatter()
-//				dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-//				decoder.dateDecodingStrategy = .formatted(dateFormatter)
 				do {
 					if let data = data {
 						let response = try decoder.decode(GetTrendingImagesResponse.self, from: data)

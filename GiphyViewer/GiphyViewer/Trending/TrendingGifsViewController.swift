@@ -8,7 +8,6 @@
 
 import UIKit
 import SnapKit
-import SwiftyGif
 
 class TrendingGifsViewController: UIViewController {
 	
@@ -27,6 +26,7 @@ class TrendingGifsViewController: UIViewController {
 	init(viewModel: TrendingGifsViewModel) {
 		self.viewModel = viewModel
 		super.init(nibName: nil, bundle: nil)
+		self.title = "Trending"
 	}
 	
 	required init?(coder: NSCoder) {
@@ -44,19 +44,19 @@ class TrendingGifsViewController: UIViewController {
 		collectionView.register(FooterView.self,
 								forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
 								withReuseIdentifier: "FooterViewIdentifier")
-
+		
 		view.addSubview(collectionView)
 		collectionView.snp.makeConstraints { make in
 			make.edges.equalToSuperview()
 		}
 		
-		collectionView.backgroundColor = .white
-		
+		collectionView.backgroundColor = .black
 		setupCollectionView()
 		prepareCellSizes()
 		
 		collectionView.reloadData()
-
+		
+		// try the appending.
 		viewModel.newItems = { [weak self] gifs in
 			self?.collectionViewProvider.items = [gifs] // give first section
 			self?.collectionViewProvider.supplementaryItems = ["i"]
@@ -93,10 +93,26 @@ class TrendingGifsViewController: UIViewController {
 }
 
 extension TrendingGifsViewController: UICollectionViewDelegate {
-
+	
 	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 		let gifObject = self.collectionViewProvider.items[indexPath.section][indexPath.row]
 		viewModel.selectedGif?(gifObject)
+	}
+	
+	func collectionView(_ collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, at indexPath: IndexPath) {
+		
+		guard elementKind == UICollectionView.elementKindSectionFooter else { return }
+		
+		let elementCount = collectionViewProvider.items
+			.flatMap { $0 }
+			.count
+		
+		viewModel.getGifs(offset: elementCount) { [weak self] gifs in
+			self?.collectionViewProvider.items.append(gifs)
+			self?.collectionViewProvider.supplementaryItems.append("ii")
+			self?.prepareCellSizes() // recomputing old objects
+			self?.collectionView.reloadData()
+		}
 	}
 }
 
@@ -104,37 +120,38 @@ extension TrendingGifsViewController: LayoutDelegate {
 	func cellSize(indexPath: IndexPath) -> CGSize {
 		return cellSizes[indexPath.section][indexPath.row]
 	}
-
+	
 	func headerHeight(indexPath: IndexPath) -> CGFloat {
-        return 12
-    }
-
-    func footerHeight(indexPath: IndexPath) -> CGFloat {
-        return 12
-    }
+		return 0
+	}
+	
+	func footerHeight(indexPath: IndexPath) -> CGFloat {
+		let sectionsCount = collectionViewProvider.supplementaryItems.count
+		return (indexPath.section == sectionsCount - 1) ? 24 : 0
+	}
 }
 
 extension CGFloat {
-    static func random() -> CGFloat {
-        return CGFloat(arc4random()) / CGFloat(UInt32.max)
-    }
+	static func random() -> CGFloat {
+		return CGFloat(arc4random()) / CGFloat(UInt32.max)
+	}
 }
 
 extension UIColor {
-    static func random() -> UIColor {
-        return UIColor(red: .random(), green: .random(), blue: .random(), alpha: 1.0)
-    }
+	static func random() -> UIColor {
+		return UIColor(red: .random(), green: .random(), blue: .random(), alpha: 1.0)
+	}
 }
 
 extension GifObject {
-
+	
 	var urlFixedWidth: URL? {
 		if let url = fixedWidthDownsampledImage?.url {
 			return URL(string: url)
 		}
 		return nil
 	}
-
+	
 	var heightFixedWidth: CGFloat? {
 		if let heightStr = fixedWidthDownsampledImage?.height,
 			let floatValue = NumberFormatter().number(from: heightStr)?.floatValue {
@@ -142,7 +159,7 @@ extension GifObject {
 		}
 		return nil
 	}
-
+	
 	var fixedWidthDownsampledImage: ImageObject? {
 		return images["fixed_width_downsampled"]
 	}
