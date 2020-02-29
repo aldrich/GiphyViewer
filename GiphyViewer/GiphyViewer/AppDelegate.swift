@@ -17,6 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
+		AppDelegate.setNavigationBarButtonItemAppearance()
+
 		self.appCoordinator = AppCoordinator()
         self.appCoordinator.start()
 		return true

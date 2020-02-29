@@ -11,9 +11,9 @@ import UIKit
 
 class TrendingGifsListCoordinator: BaseCoordinator {
 
-    private let viewModel: TrendingGifsViewModel
+	private let viewModel: TrendingGifsViewModel
 
-    init(viewModel: TrendingGifsViewModel) {
+	init(viewModel: TrendingGifsViewModel) {
 		self.viewModel = viewModel
 		super.init()
 
@@ -22,15 +22,25 @@ class TrendingGifsListCoordinator: BaseCoordinator {
 		}
 	}
 
-    override func start() {
+	override func start() {
 		let viewController = TrendingGifsViewController(viewModel: viewModel)
-        // self.navigationController.isNavigationBarHidden = true
-        self.navigationController.viewControllers = [viewController]
-    }
+		self.navigationController.viewControllers = [viewController]
+	}
 
 	private func showDetail(gif: GifObject) {
 		let viewModel = GifDetailViewModel(gif: gif)
 		let viewController = GifDetailViewController(viewModel: viewModel)
-		self.navigationController.pushViewController(viewController, animated: true)
+
+		let backButtonItem = UIBarButtonItem(title: "", style: .plain,
+											 target: nil, action: nil)
+		backButtonItem.tintColor = .black
+		if viewController.traitCollection.userInterfaceStyle == .dark {
+			backButtonItem.tintColor = .white
+		}
+
+		navigationController.topViewController?
+			.navigationItem.backBarButtonItem = backButtonItem
+
+		navigationController.pushViewController(viewController, animated: true)
 	}
 }
