@@ -20,6 +20,7 @@ class ContentCell: UICollectionViewCell {
 	let label: UILabel = {
 		let ret = UILabel()
 		ret.textColor = .white
+		ret.backgroundColor = .black
 		ret.numberOfLines = 0
 		ret.font = .systemFont(ofSize: 12)
 		ret.textAlignment = .center
@@ -34,7 +35,7 @@ class ContentCell: UICollectionViewCell {
 	func populate(with item: GifObject) {
 		backgroundColor = UIColor.random()
 			.withAlphaComponent(0.5)
-		label.text = "" // item.title
+		label.text = item.title
 		if let url = item.urlFixedWidth {
 			imageView.setGifFromURL(url, levelOfIntegrity: .lowForTooManyGifs)
 		} else {
@@ -52,9 +53,7 @@ class ContentCell: UICollectionViewCell {
 
 		contentView.addSubview(label)
 		label.snp.makeConstraints { make in
-			make.centerX.equalToSuperview()
-			make.left.equalToSuperview().offset(10)
-			make.bottom.equalToSuperview().offset(-10)
+			make.left.right.bottom.equalToSuperview()
 		}
 	}
 

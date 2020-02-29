@@ -28,7 +28,27 @@ class TrendingGifsViewController: UIViewController {
 		super.init(nibName: nil, bundle: nil)
 		self.title = "Trending"
 	}
-	
+
+	override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        if UIDevice.current.orientation.isLandscape {
+            // Landscape
+			setGridLayout(columns: 3)
+        } else {
+			// Portrait
+            setGridLayout(columns: 2)
+        }
+    }
+
+	func setGridLayout(columns: Int) {
+		let layout = GridLayout()
+		layout.columnsCount = columns
+		collectionView.collectionViewLayout = layout
+		layout.delegate = self
+		layout.cellsPadding = ItemsPadding(horizontal: 8, vertical: 8)
+		collectionView.reloadData()
+	}
+
 	required init?(coder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
@@ -104,10 +124,8 @@ class TrendingGifsViewController: UIViewController {
 		collectionView.delegate = self
 		collectionViewProvider.items = []
 		collectionViewProvider.supplementaryItems = []
-		let layout = GridLayout()
-		collectionView.collectionViewLayout = layout
-		layout.delegate = self
-		layout.cellsPadding = ItemsPadding(horizontal: 8, vertical: 8)
+
+		setGridLayout(columns: 2)
 	}
 	
 	private func prepareCellSizes() {
