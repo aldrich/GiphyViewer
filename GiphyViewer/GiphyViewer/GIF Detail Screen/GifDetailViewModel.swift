@@ -68,12 +68,10 @@ class GifDetailViewModel {
 
 	/// Downloads a Data object from the given URL. Returns to main block
 	func fetchData(from url: URL, completion: @escaping (Data?) -> ()) {
-		URLSession.shared
-			.dataTask(with: url) { (data, _, _) in
-				DispatchQueue.main.async {
-					completion(data)
-				}
+		networking.download(url: url) { data in
+			DispatchQueue.main.async {
+				completion(data)
 			}
-			.resume()
+		}
 	}
 }

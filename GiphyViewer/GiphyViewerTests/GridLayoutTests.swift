@@ -129,9 +129,12 @@ class PinterestLayoutDelegate: NSObject, LayoutDelegate {
 }
 
 extension GifObject {
-	static func with(id: String) -> GifObject {
+	static func with(id: String,
+					 date: String = "",
+					 username: String = "") -> GifObject {
+
 		return GifObject(id: id,
-						 images: [:], importDatetime: "", title: "",
-						 trendingDatetime: "", url: "", username: "")
+						 images: [:], importDatetime: date, title: "",
+						 trendingDatetime: "", url: "", username: username)
 	}
 }
