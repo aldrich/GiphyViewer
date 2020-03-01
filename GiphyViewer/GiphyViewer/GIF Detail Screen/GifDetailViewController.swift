@@ -27,6 +27,8 @@ class GifDetailViewController: UIViewController {
 		label.numberOfLines = 0
 		label.textColor = .white
 		label.textAlignment = .center
+		label.accessibilityIdentifier = "info-label"
+		label.accessibilityLabel = "GIF info"
 		return label
 	}()
 

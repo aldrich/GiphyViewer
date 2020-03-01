@@ -42,6 +42,7 @@ class ContentCell: UICollectionViewCell {
 		throttler.throttle { [weak self] in
 			self?.imageView.animate(withGIFURL: url)
 		}
+		self.accessibilityLabel = item.title
 	}
 
 	override init(frame: CGRect) {

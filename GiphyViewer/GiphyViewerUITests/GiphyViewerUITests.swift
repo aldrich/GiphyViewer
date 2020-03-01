@@ -10,25 +10,40 @@ import XCTest
 
 class GiphyViewerUITests: XCTestCase {
 
-    override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+	override func setUp() {
+		// In UI tests it is usually best to stop immediately when a failure occurs.
+		continueAfterFailure = false
 
-        // In UI tests it is usually best to stop immediately when a failure occurs.
-        continueAfterFailure = false
+		// In UI tests it’s important to set the initial state -
+		// such as interface orientation - required for your tests before they
+		// run. The setUp method is a good place to do this.
+	}
 
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
-    }
+	func testTapOnACellOnList() {
 
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
+		let app = XCUIApplication()
+		app.launch()
 
-    func testExample() {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
-        app.launch()
+		// tap on an arbitrary cell
+		let cell = app.cells["index-3"]
+		_ = cell.waitForExistence(timeout: 4.0)
 
-        // Use recording to get started writing UI tests.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
+		// capture title on cell
+		let cellTitle = cell.label
+
+		cell.tap()
+
+		let navbar = app.navigationBars.firstMatch
+		_ = navbar.waitForExistence(timeout: 4.0)
+
+		// title on next screen shows the same title as the GIF tapped from list
+		XCTAssertEqual(navbar.identifier, cellTitle)
+
+		let infoLabel = app.staticTexts["info-label"]
+		_ = infoLabel.waitForExistence(timeout: 4)
+
+		// info label exists
+		print(infoLabel.label)
+		XCTAssertEqual(infoLabel.label, "GIF info")
+	}
 }

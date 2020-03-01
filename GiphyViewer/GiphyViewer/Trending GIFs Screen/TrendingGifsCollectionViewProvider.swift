@@ -30,6 +30,7 @@ class TrendingGifsCollectionViewProvider: NSObject, UICollectionViewDataSource {
 		if let cell = cell as? ContentCell {
 			let item = items[indexPath.section][indexPath.row]
 			cell.populate(with: item)
+			cell.accessibilityIdentifier = "index-\(indexPath.row)"
 		}
 		return cell
 	}
