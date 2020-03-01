@@ -9,6 +9,7 @@
 import UIKit
 import SnapKit
 import SwiftyGif
+import Photos
 
 class GifDetailViewController: UIViewController {
 
@@ -86,5 +87,34 @@ class GifDetailViewController: UIViewController {
 		} else {
 			infoLabel.text = "Unable to load image"
 		}
+
+		self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save,
+																 target: self,
+																 action: #selector(save))
     }
+
+	@objc func save() {
+		NetworkingAPI.download(gif: viewModel.gif) { [weak self] data in
+			guard let self = self else { return }
+			if let data = data {
+
+				PHPhotoLibrary.shared().performChanges({
+					let request = PHAssetCreationRequest.forAsset()
+					request.addResource(with: .photo, data: data, options: nil)
+				}) { (success, error) in
+					DispatchQueue.main.async {
+						if let error = error {
+							print(error.localizedDescription)
+						} else {
+							let alert = UIAlertController(title: "Success",
+														  message: "Saved to Gallery",
+														  preferredStyle: .alert)
+							alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+							self.present(alert, animated: true) {}
+						}
+					}
+				}
+			}
+		}
+	}
 }
