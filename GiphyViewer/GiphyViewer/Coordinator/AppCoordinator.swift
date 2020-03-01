@@ -13,9 +13,7 @@ class AppCoordinator: BaseCoordinator {
 
 	private var window = UIWindow(frame: UIScreen.main.bounds)
 
-	override init() {
-		// inject any dependencies here.
-	}
+	override init() {}
 
 	override func start() {
 		self.window.makeKeyAndVisible()
@@ -25,12 +23,10 @@ class AppCoordinator: BaseCoordinator {
 	private func showGifList() {
 		self.removeChildCoordinators()
 
-		let viewModel = TrendingGifsViewModel() // use dependency injection
+		let viewModel = TrendingGifsViewModel(networking: GiphyAPIClient())
 		let coordinator = TrendingGifsListCoordinator(viewModel: viewModel)
-			// AppDelegate.container.resolve(DrawerMenuCoordinator.self)!
 
-		coordinator.navigationController = UINavigationController() // BaseNavigationController()
-
+		coordinator.navigationController = UINavigationController()
 
 		self.start(coordinator: coordinator)
 

@@ -17,7 +17,8 @@ class TrendingGifsCollectionViewProvider: NSObject, UICollectionViewDataSource {
 		return supplementaryItems.count
 	}
 	
-	func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+	func collectionView(_ collectionView: UICollectionView,
+						numberOfItemsInSection section: Int) -> Int {
 		return items[section].count
 	}
 	
@@ -36,14 +37,9 @@ class TrendingGifsCollectionViewProvider: NSObject, UICollectionViewDataSource {
 	func collectionView(_ collectionView: UICollectionView,
 						viewForSupplementaryElementOfKind kind: String,
 						at indexPath: IndexPath) -> UICollectionReusableView {
-		
-		let footerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-																		 withReuseIdentifier: "FooterViewIdentifier",
-																		 for: indexPath)
-		if let footerView = footerView as? FooterView {
-			let item = supplementaryItems[indexPath.section]
-			footerView.populate(with: item)
-		}
-		return footerView
+
+		return collectionView.dequeueReusableSupplementaryView(ofKind: kind,
+															   withReuseIdentifier: "FooterViewIdentifier",
+															   for: indexPath)
 	}
 }

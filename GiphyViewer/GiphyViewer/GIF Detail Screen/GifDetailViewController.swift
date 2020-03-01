@@ -14,19 +14,12 @@ import Photos
 class GifDetailViewController: UIViewController {
 
 	enum Constants {
-		// typical form returned by API
-		static let inputDateFormat = "yyyy-MM-dd hh:mm:ss"
-
-		static let outputDateFormat = "MMMM dd yyyy, h:mm a"
-
 		static let failedToLoadMessage = "Unable to load image"
 	}
 
 	private let viewModel: GifDetailViewModel
 
-	private var gifObject: GifObject {
-		return viewModel.gif
-	}
+	let imageView = GIFImageView()
 
 	let infoLabel: UILabel = {
 		let label = UILabel()
@@ -37,12 +30,10 @@ class GifDetailViewController: UIViewController {
 		return label
 	}()
 
-	let imageView = GIFImageView()
-
 	init(viewModel: GifDetailViewModel) {
 		self.viewModel = viewModel
 		super.init(nibName: nil, bundle: nil)
-		title = viewModel.gif.title
+		title = gifObject.title
 	}
 
 	required init?(coder: NSCoder) {
@@ -77,76 +68,42 @@ class GifDetailViewController: UIViewController {
 			}
 		}
 
-		loadGif()
+		loadGifImage()
 		setSaveButton()
-		setInfoPanel()
+
+		infoLabel.text = viewModel.getUploadInfo()
     }
 
-	private func setInfoPanel() {
-		let dateFormatter = DateFormatter()
-		dateFormatter.dateFormat = Constants.inputDateFormat
-		var dateStr = gifObject.importDatetime
-		if let date = dateFormatter.date(from: dateStr) {
-			dateFormatter.dateFormat = Constants.outputDateFormat
-			dateStr = dateFormatter.string(from: date)
-		}
-		let username = gifObject.username
-		if username.isEmpty {
-			infoLabel.text = String(format: "Uploaded on %@", dateStr)
-		} else {
-			infoLabel.text = String(format: "Uploaded %@ by %@", dateStr, username)
-		}
-	}
-
-	private func loadGif() {
-
+	private func loadGifImage() {
 		// add a low-cost still image to display while loading full gif
-		if let url = gifObject.fixedWidthStillImage?.imageURL {
-			getData(from: url) { data, response, error in
-				DispatchQueue.main.async { [weak self] in
-					guard let self = self, let data = data else { return }
-					self.imageView.image = UIImage(data: data)
-					let spinner = UIActivityIndicatorView(style: .large)
-					spinner.startAnimating()
-					self.imageView.addSubview(spinner)
-					spinner.snp.makeConstraints { (make) in
-						make.center.equalToSuperview()
-					}
-				}
-			}
-		}
-
-		// also load full gif simultaneously and show it if its ready
-		if let url = gifObject.fullScreenGifImage?.imageURL {
-			self.imageView.animate(withGIFURL: url, loopCount: 0) {
-				DispatchQueue.main.async { [weak self] in
-					self?.imageView.image = nil
-					self?.imageView.subviews.forEach {
-						$0.removeFromSuperview()
-					}
-				}
-			}
-		}
-	}
-
-	func getData(from url: URL, completion: @escaping (Data?, URLResponse?, Error?) -> ()) {
-		URLSession.shared.dataTask(with: url, completionHandler: completion).resume()
-	}
-
-	func downloadImage(from url: URL) {
-		print("Download Started")
-		getData(from: url) { data, response, error in
-			guard let data = data, error == nil else { return }
-			print(response?.suggestedFilename ?? url.lastPathComponent)
-			print("Download Finished")
-			DispatchQueue.main.async() {
+		if let url = stillImageURL {
+			viewModel.fetchData(from: url) { [weak self] data in
+				guard let self = self, let data = data else { return }
 				self.imageView.image = UIImage(data: data)
+				self.imageView.showSpinner()
+			}
+		}
+		// simultaneously load full gif (which appears later) and show it if
+		// it's ready, removing the static placeholder image.
+		if let url = fullScreenGifImageURL {
+			imageView.animate(withGIFURL: url) { // on GIF load completion,
+				DispatchQueue.main.async { [weak self] in
+					self?.imageView.showSpinner(false)
+					self?.imageView.image = nil
+				}
 			}
 		}
 	}
 
-	private func setSaveButton(isBusy: Bool = false) {
-		guard !isBusy else {
+	enum RightSideButtonMode {
+		case busy
+		case saveButton
+	}
+
+	/// Show the save button on the right side of the navigation button, or a
+	/// busy spinner in its place (if isBusy is true)
+	private func setSaveButton(mode: RightSideButtonMode = .saveButton) {
+		guard mode == .saveButton else {
 			let spinner = UIActivityIndicatorView(style: .medium)
 			navigationItem.rightBarButtonItem = UIBarButtonItem(customView: spinner)
 			spinner.startAnimating()
@@ -158,27 +115,63 @@ class GifDetailViewController: UIViewController {
 	}
 
 	@objc func save() {
-		setSaveButton(isBusy: true)
+		setSaveButton(mode: .busy)
+		// must have original (full-sized) GIF image with url to proceed
+		guard let originalImage = gifObject.originalImage,
+			let hqImageURL = originalImage.imageURL else {
+				print("original GIF image not available.")
+				return
+		}
 
-		NetworkingAPI.download(gif: viewModel.gif) { [weak self] data in
-			guard let self = self, let data = data else { return }
-			PHPhotoLibrary.shared().performChanges({
-				let request = PHAssetCreationRequest.forAsset()
-				request.addResource(with: .photo, data: data, options: nil)
-			}) { success, error in
-				DispatchQueue.main.async { [weak self] in
-					if let error = error {
-						print(error.localizedDescription)
-					} else {
-						let alert = UIAlertController(title: "Success",
-													  message: "Saved GIF to Gallery!",
-													  preferredStyle: .alert)
-						alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-						self?.present(alert, animated: true) {}
-					}
-					self?.setSaveButton()
-				}
-			}
+		viewModel.downloadAndSaveToPhotoGallery(url: hqImageURL) { [weak self] error in
+			self?.showPostSaveGIFAlert(error: error)
+			self?.setSaveButton()
+		}
+	}
+
+	private func showPostSaveGIFAlert(error: Error? = nil) {
+		var alert: UIAlertController!
+		if let error = error {
+			alert = UIAlertController(title: "Failure",
+									  message: error.localizedDescription,
+									  preferredStyle: .alert)
+		} else {
+			alert = UIAlertController(title: "Success",
+									  message: "Saved GIF to Gallery!",
+									  preferredStyle: .alert)
+		}
+		alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+		present(alert, animated: true) {}
+	}
+}
+
+extension GifDetailViewController {
+	private var gifObject: GifObject {
+		return viewModel.gif
+	}
+
+	private var stillImageURL: URL? {
+		return gifObject.fixedWidthStillImage?.imageURL
+	}
+
+	private var fullScreenGifImageURL: URL? {
+		return gifObject.fullScreenGifImage?.imageURL
+	}
+}
+
+extension UIImageView {
+
+	// Adds a spinner on the main gif view while the actual gif is still loading
+	func showSpinner(_ show: Bool = true) {
+		guard show else {
+			self.subviews.forEach { $0.removeFromSuperview() }
+			return
+		}
+		let spinner = UIActivityIndicatorView(style: .large)
+		spinner.startAnimating()
+		self.addSubview(spinner)
+		spinner.snp.makeConstraints { (make) in
+			make.center.equalToSuperview()
 		}
 	}
 }

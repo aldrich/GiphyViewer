@@ -77,6 +77,8 @@ class TrendingGifsViewController: UIViewController {
 		viewModel.receivedNewGifObjects = { [weak self] gifs in
 			self?.updateWithNewItems(gifs)
 		}
+
+		viewModel.fetchInitialData()
 	}
 
 	private func updateWithNewItems(_ items: [GifObject]) {
@@ -176,6 +178,10 @@ extension GifObject {
 
 	var fixedWidthStillImage: ImageObject? {
 		return images["fixed_width_still"]
+	}
+
+	var originalImage: ImageObject? {
+		return images["original"]
 	}
 }
 

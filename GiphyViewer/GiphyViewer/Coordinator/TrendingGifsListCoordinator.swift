@@ -28,7 +28,7 @@ class TrendingGifsListCoordinator: BaseCoordinator {
 	}
 
 	private func showDetail(gif: GifObject) {
-		let viewModel = GifDetailViewModel(gif: gif)
+		let viewModel = GifDetailViewModel(gif: gif, networking: GiphyAPIClient())
 		let viewController = GifDetailViewController(viewModel: viewModel)
 
 		let backButtonItem = UIBarButtonItem(title: "", style: .plain,
@@ -41,6 +41,7 @@ class TrendingGifsListCoordinator: BaseCoordinator {
 		navigationController.topViewController?
 			.navigationItem.backBarButtonItem = backButtonItem
 
-		navigationController.pushViewController(viewController, animated: true)
+		let animated = !Thread.current.isRunningXCTest
+		navigationController.pushViewController(viewController, animated: animated)
 	}
 }

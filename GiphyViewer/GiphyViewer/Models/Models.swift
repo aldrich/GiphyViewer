@@ -10,8 +10,6 @@ import Foundation
 
 // Ref: https://developers.giphy.com/docs/api/schema#gif-object
 struct GifObject: Decodable {
-	let bitlyUrl: String
-	let embedUrl: String
 	let id: String // unique id
 	let images: [String: ImageObject]
 	let importDatetime: String

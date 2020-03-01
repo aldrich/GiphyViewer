@@ -11,6 +11,7 @@ import UIKit
 
 public class GridLayout: BaseLayout {
 	
+	// default column count, can be set to a different value
 	public var columnsCount = 2
 	
 	override public func calculateCollectionViewFrames() {

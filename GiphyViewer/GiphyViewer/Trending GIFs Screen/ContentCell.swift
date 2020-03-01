@@ -11,17 +11,15 @@ import Gifu
 
 class ContentCell: UICollectionViewCell {
 
+	func getRandomColor() -> UIColor {
+		return UIColor.random().withAlphaComponent(0.2)
+	}
+
 	override func prepareForReuse() {
 		super.prepareForReuse()
-
-		// only way to avoid another playing gif when a cell is reused
-		let randomColorImage = UIImage(color: .random(),
-									   size: .init(width: 1, height: 1))!
-		imageView.image = randomColorImage
-
 		// free up resources (Gifu framework)
 		imageView.prepareForReuse()
-		label.text = nil
+		imageView.image = UIImage(color: getRandomColor())!
 	}
 
 	// When scrolling quickly, a collection view cell can be reused many times
@@ -35,24 +33,14 @@ class ContentCell: UICollectionViewCell {
 
 	let imageView = GIFImageView()
 
-	let label: UILabel = {
-		let ret = UILabel()
-		ret.textColor = .white
-		ret.backgroundColor = UIColor(white: 0, alpha: 0.4)
-		ret.numberOfLines = 0
-		ret.font = .systemFont(ofSize: 12)
-		ret.textAlignment = .center
-		return ret
-	}()
-
 	func populate(with item: GifObject) {
-		backgroundColor = UIColor.random()
-			.withAlphaComponent(0.3)
-		label.text = item.title
-		if let url = item.fixedWidthDownsampledImage?.imageURL {
-			throttler.throttle { [weak self] in
-				self?.imageView.animate(withGIFURL: url)
-			}
+		backgroundColor = getRandomColor()
+		imageView.image = UIImage(color: getRandomColor())!
+		guard let url = item.fixedWidthDownsampledImage?.imageURL else {
+			return
+		}
+		throttler.throttle { [weak self] in
+			self?.imageView.animate(withGIFURL: url)
 		}
 	}
 
@@ -63,11 +51,17 @@ class ContentCell: UICollectionViewCell {
 		imageView.snp.makeConstraints { make in
 			make.edges.equalToSuperview()
 		}
+	}
 
-		contentView.addSubview(label)
-		label.snp.makeConstraints { make in
-			make.left.right.bottom.equalToSuperview()
-		}
+	required init?(coder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
+}
+
+class FooterView: UICollectionReusableView {
+
+	override init(frame: CGRect) {
+		super.init(frame: frame)
 	}
 
 	required init?(coder: NSCoder) {

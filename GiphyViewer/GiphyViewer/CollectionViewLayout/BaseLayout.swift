@@ -8,6 +8,7 @@
 
 import UIKit
 
+// Based on https://github.com/rubygarage/collection-view-layouts
 @objc public protocol LayoutDelegate: class {
     func cellSize(indexPath: IndexPath) -> CGSize
     @objc optional func headerHeight(indexPath: IndexPath) -> CGFloat
@@ -62,7 +63,8 @@ public class BaseLayout: UICollectionViewLayout {
         fatalError("Method must be overriden")
     }
 
-    func addAttributesForSupplementaryView(ofKind kind: String, section: Int, yOffset: inout CGFloat) {
+    func addAttributesForSupplementaryView(ofKind kind: String, section: Int,
+										   yOffset: inout CGFloat) {
         guard let delegate = delegate else {
             return
         }
@@ -83,8 +85,10 @@ public class BaseLayout: UICollectionViewLayout {
             return
         }
 
-        let x = delegateWidth == nil ? contentPadding.horizontal : contentSize.width / 2 - delegateWidth! / 2
-        let origin = CGPoint(x: x, y: yOffset)
+        let x = delegateWidth == nil ? contentPadding.horizontal :
+			contentSize.width / 2 - delegateWidth! / 2
+
+		let origin = CGPoint(x: x, y: yOffset)
         let width = delegateWidth ?? contentWidthWithoutPadding
         let size = CGSize(width: width, height: height)
 
@@ -95,8 +99,10 @@ public class BaseLayout: UICollectionViewLayout {
         yOffset += height + cellsPadding.vertical
     }
 
-    func addAttributesForSupplementaryView(ofKind kind: String, section: Int, yOffsets: inout [CGFloat]) {
-        addAttributesForSupplementaryView(ofKind: kind, section: section, yOffset: &yOffsets[0])
+    func addAttributesForSupplementaryView(ofKind kind: String, section: Int,
+										   yOffsets: inout [CGFloat]) {
+        addAttributesForSupplementaryView(ofKind: kind, section: section,
+										  yOffset: &yOffsets[0])
 
         let y = yOffsets[0]
         for index in 0..<yOffsets.count {
