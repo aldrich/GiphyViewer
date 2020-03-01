@@ -162,7 +162,7 @@
 				BEBB7980240A0FA1002375AE /* Models */,
 				BEBB797C240A0FA1002375AE /* Coordinator */,
 				BEBB7982240A0FA1002375AE /* Trending GIFs List */,
-				BEBB7979240A0FA1002375AE /* GIFDetail */,
+				BEBB7979240A0FA1002375AE /* GIF Detail Screen */,
 				BE3634F4240913D60099D591 /* AppDelegate.swift */,
 				BE3634FD240913D80099D591 /* Assets.xcassets */,
 				BE3634FF240913D80099D591 /* LaunchScreen.storyboard */,
@@ -209,13 +209,13 @@
 			path = CollectionViewLayout;
 			sourceTree = "<group>";
 		};
-		BEBB7979240A0FA1002375AE /* GIFDetail */ = {
+		BEBB7979240A0FA1002375AE /* GIF Detail Screen */ = {
 			isa = PBXGroup;
 			children = (
 				BEBB7996240A108A002375AE /* GifDetailViewController.swift */,
 				BEBB7998240A109B002375AE /* GifDetailViewModel.swift */,
 			);
-			path = GIFDetail;
+			path = "GIF Detail Screen";
 			sourceTree = "<group>";
 		};
 		BEBB797A240A0FA1002375AE /* Networking */ = {

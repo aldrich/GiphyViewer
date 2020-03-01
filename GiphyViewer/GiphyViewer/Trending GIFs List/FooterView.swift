@@ -23,8 +23,11 @@ class FooterView: UICollectionReusableView {
 		super.init(frame: frame)
 		self.addSubview(label)
 		label.snp.makeConstraints { make in
-			make.center.equalToSuperview()
-			make.left.equalToSuperview().offset(10)
+			// as the footer view could momentarily be zero height, setting
+			// lower-than-required priority to avoid constraint warnings for
+			// the label.
+			make.center.equalToSuperview().priority(.high)
+			make.left.equalToSuperview().offset(10).priority(.high)
 		}
 	}
 

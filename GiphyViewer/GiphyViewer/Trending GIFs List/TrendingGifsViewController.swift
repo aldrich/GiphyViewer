@@ -28,12 +28,19 @@ class TrendingGifsViewController: UIViewController {
 
 	override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        if UIDevice.current.orientation.isLandscape {
-			setGridLayout(columns: 3)
-        } else {
-            setGridLayout(columns: 2)
-        }
+		let numberOfColumns = getNumberOfColumns()
+		setGridLayout(columns: numberOfColumns)
     }
+
+	private func getNumberOfColumns() -> Int {
+		guard UIDevice.current.orientation.isLandscape else {
+			return 2
+		}
+		let size = UIScreen.main.bounds.size
+		let landscapeWidth = max(size.width, size.height)
+		let ret = ceil(landscapeWidth / 200.0)
+		return Int(ret)
+	}
 
 	func setGridLayout(columns: Int) {
 		let layout = GridLayout()
@@ -41,6 +48,7 @@ class TrendingGifsViewController: UIViewController {
 		collectionView.collectionViewLayout = layout
 		layout.delegate = self
 		layout.cellsPadding = ItemsPadding(horizontal: 8, vertical: 8)
+		collectionView.reloadData()
 	}
 
 	required init?(coder: NSCoder) {
@@ -58,7 +66,7 @@ class TrendingGifsViewController: UIViewController {
 
 		view.addSubview(collectionView)
 		collectionView.snp.makeConstraints { make in
-			make.edges.equalToSuperview()
+			make.edges.equalTo(view.safeAreaLayoutGuide)
 		}
 		
 		collectionView.backgroundColor = .black
@@ -107,7 +115,8 @@ class TrendingGifsViewController: UIViewController {
 		collectionViewProvider.items = [[]]
 		collectionViewProvider.supplementaryItems = [""]
 
-		setGridLayout(columns: 2)
+		let numberOfColumns = getNumberOfColumns()
+		setGridLayout(columns: numberOfColumns)
 	}
 	
 	private func prepareCellSizes() {
