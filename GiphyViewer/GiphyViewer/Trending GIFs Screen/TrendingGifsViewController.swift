@@ -77,6 +77,8 @@ class TrendingGifsViewController: UIViewController {
 		viewModel.receivedNewGifObjects = { [weak self] gifs in
 			self?.updateWithNewItems(gifs)
 		}
+
+		viewModel.fetchInitialData()
 	}
 
 	private func updateWithNewItems(_ items: [GifObject]) {
