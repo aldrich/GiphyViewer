@@ -28,7 +28,7 @@ class TrendingGifsViewModel {
 		range.forEach { index in
 			let limit = Constants.limit // i.e., 25 GIFs
 			let offset = index * limit
-			NetworkingAPI.getTrendingGifs(offset: offset, limit: limit) { [weak self] gifs in
+			Networking.getTrendingGifs(offset: offset, limit: limit) { [weak self] gifs in
 				guard let self = self else { return }
 				self.results[index] = gifs
 				self.receivedNewGifObjects?(self.flattenedGifsResults)
@@ -40,7 +40,7 @@ class TrendingGifsViewModel {
 	func addNextGifObjects() {
 		let index = nextIndex()
 		let offset = Constants.limit * index
-		NetworkingAPI.getTrendingGifs(offset: offset) { [weak self] gifs in
+		Networking.getTrendingGifs(offset: offset) { [weak self] gifs in
 			guard let self = self else { return }
 			self.results[index] = gifs
 			self.receivedNewGifObjects?(self.flattenedGifsResults)

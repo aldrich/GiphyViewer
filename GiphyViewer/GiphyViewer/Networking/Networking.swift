@@ -8,7 +8,7 @@
 
 import Foundation
 
-class NetworkingAPI: NSObject {
+class Networking: NSObject {
 
 	typealias CompletionBlock = ([GifObject]) -> Void
 
@@ -24,15 +24,9 @@ class NetworkingAPI: NSObject {
 		static let limit = 25
 	}
 
-	class func download(gif: GifObject, completion: @escaping (Data?) -> Void) {
+	static func download(url: URL, completion: @escaping (Data?) -> Void) {
 		let session = URLSession(configuration: .default)
-
-		guard let originalImage = gif.images["original"], let hqURLStr = originalImage.url else {
-			completion(nil)
-			return
-		}
-		let request = URLRequest(url: URL(string: hqURLStr)!)
-
+		let request = URLRequest(url: url)
 		let operation = DataFetchOperation(session: session, request: request,
 										   completion: { (data, response, error) -> Void in
 											DispatchQueue.main.async {
@@ -42,7 +36,7 @@ class NetworkingAPI: NSObject {
 		queue.addOperation(operation)
 	}
 
-	class func getTrendingGifs(offset: Int, limit: Int = Constants.limit,
+	static func getTrendingGifs(offset: Int, limit: Int = Constants.limit,
 							   completion: @escaping CompletionBlock) {
 
 		let session = URLSession(configuration: .default)

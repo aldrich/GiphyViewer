@@ -8,6 +8,9 @@
 
 import Foundation
 
+// (Copied from http://danielemargutti.com/2017/10/19/throttle-in-swift/)
+// `throttle` causes the block to be executed no more than once within the
+// given interval.
 class Throttler {
 
     private var workItem: DispatchWorkItem = DispatchWorkItem(block: {})
@@ -24,7 +27,8 @@ class Throttler {
         // Cancel any existing work item if it has not yet executed
         workItem.cancel()
 
-        // Re-assign workItem with the new block task, resetting the previousRun time when it executes
+        // Re-assign workItem with the new block task, resetting the
+		// previousRun time when it executes
         workItem = DispatchWorkItem() {
             [weak self] in
             self?.previousRun = Date()

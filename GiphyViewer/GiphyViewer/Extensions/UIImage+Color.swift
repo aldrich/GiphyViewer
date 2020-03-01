@@ -9,6 +9,8 @@
 import UIKit
 
 public extension UIImage {
+
+	/// Creates an image based on a single color
 	convenience init?(color: UIColor, size: CGSize = CGSize(width: 1, height: 1)) {
 		let rect = CGRect(origin: .zero, size: size)
 		UIGraphicsBeginImageContextWithOptions(rect.size, false, 0.0)

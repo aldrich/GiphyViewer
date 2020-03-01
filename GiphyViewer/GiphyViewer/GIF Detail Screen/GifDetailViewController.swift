@@ -42,7 +42,7 @@ class GifDetailViewController: UIViewController {
 	init(viewModel: GifDetailViewModel) {
 		self.viewModel = viewModel
 		super.init(nibName: nil, bundle: nil)
-		title = viewModel.gif.title
+		title = gifObject.title
 	}
 
 	required init?(coder: NSCoder) {
@@ -158,26 +158,50 @@ class GifDetailViewController: UIViewController {
 	}
 
 	@objc func save() {
+
 		setSaveButton(isBusy: true)
 
-		NetworkingAPI.download(gif: viewModel.gif) { [weak self] data in
-			guard let self = self, let data = data else { return }
-			PHPhotoLibrary.shared().performChanges({
-				let request = PHAssetCreationRequest.forAsset()
-				request.addResource(with: .photo, data: data, options: nil)
-			}) { success, error in
-				DispatchQueue.main.async { [weak self] in
-					if let error = error {
-						print(error.localizedDescription)
-					} else {
-						let alert = UIAlertController(title: "Success",
-													  message: "Saved GIF to Gallery!",
-													  preferredStyle: .alert)
-						alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-						self?.present(alert, animated: true) {}
-					}
-					self?.setSaveButton()
-				}
+		// must have original (full-sized) GIF image with url to proceed
+		guard let originalImage = gifObject.originalImage,
+			let hqImageURL = originalImage.imageURL else {
+				print("original GIF image not available.")
+				return
+		}
+
+		Networking.download(url: hqImageURL) { [weak self] data in
+			guard let data = data else { print("empty download"); return }
+			self?.saveDataAsGIFToPhotoGallery(data: data) { [weak self] error in
+				self?.showPostSaveGIFAlert(error: error)
+				self?.setSaveButton()
+			}
+		}
+	}
+
+	private func showPostSaveGIFAlert(error: Error? = nil) {
+		var alert: UIAlertController!
+		if let error = error {
+			alert = UIAlertController(title: "Failure",
+									  message: error.localizedDescription,
+									  preferredStyle: .alert)
+		} else {
+			alert = UIAlertController(title: "Success",
+									  message: "Saved GIF to Gallery!",
+									  preferredStyle: .alert)
+		}
+		alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+		present(alert, animated: true) {}
+	}
+
+	/// Saves Data object to Photos app as an image object, works for GIFs.
+	/// Completion block is on the main thread.
+	private func saveDataAsGIFToPhotoGallery(data: Data,
+											 completion: @escaping (Error?) -> Void) {
+		PHPhotoLibrary.shared().performChanges({
+			let request = PHAssetCreationRequest.forAsset()
+			request.addResource(with: .photo, data: data, options: nil)
+		}) { _, error in
+			DispatchQueue.main.async {
+				completion(error)
 			}
 		}
 	}

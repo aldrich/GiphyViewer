@@ -177,6 +177,10 @@ extension GifObject {
 	var fixedWidthStillImage: ImageObject? {
 		return images["fixed_width_still"]
 	}
+
+	var originalImage: ImageObject? {
+		return images["original"]
+	}
 }
 
 extension ImageObject {

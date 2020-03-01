@@ -11,6 +11,7 @@ import UIKit
 
 extension AppDelegate {
 
+	/// Makes the navbar back button use the specified chevron image asset
 	static func setNavigationBarButtonItemAppearance() {
 		let backImage = #imageLiteral(resourceName: "back-button-item")
 			.withRenderingMode(.alwaysTemplate)
@@ -18,6 +19,7 @@ extension AppDelegate {
 		UINavigationBar.appearance().backIndicatorTransitionMaskImage = backImage
 	}
 
+	/// Configures the standard navbar appearance
 	static func setUpNavigationBarGeneralAppearance() {
 		let setAppearance = { (bar: UINavigationBar) in
 			bar.barStyle = .default

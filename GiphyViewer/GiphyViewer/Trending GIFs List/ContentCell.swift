@@ -15,8 +15,7 @@ class ContentCell: UICollectionViewCell {
 		super.prepareForReuse()
 
 		// only way to avoid another playing gif when a cell is reused
-		let randomColorImage = UIImage(color: .random(),
-									   size: .init(width: 1, height: 1))!
+		let randomColorImage = UIImage(color: .random())!
 		imageView.image = randomColorImage
 
 		// free up resources (Gifu framework)
