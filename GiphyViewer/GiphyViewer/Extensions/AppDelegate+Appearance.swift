@@ -17,4 +17,18 @@ extension AppDelegate {
 		UINavigationBar.appearance().backIndicatorImage = backImage
 		UINavigationBar.appearance().backIndicatorTransitionMaskImage = backImage
 	}
+
+	static func setUpNavigationBarGeneralAppearance() {
+		let setAppearance = { (bar: UINavigationBar) in
+			bar.barStyle = .default
+			bar.isTranslucent = false
+			bar.barTintColor = .black
+			bar.tintColor = .white
+			bar.titleTextAttributes = [
+				.foregroundColor: UIColor.white,
+				.font: UIFont.boldSystemFont(ofSize: 14)
+			]
+		}
+		setAppearance(UINavigationBar.appearance())
+	}
 }

@@ -11,7 +11,10 @@ import Foundation
 class GifDetailViewModel {
 
 	let gif: GifObject
+
 	init(gif: GifObject) {
 		self.gif = gif
 	}
+
+	
 }

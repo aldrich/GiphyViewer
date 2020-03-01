@@ -8,12 +8,25 @@
 
 import UIKit
 import SnapKit
-import SwiftyGif
+import Gifu
 import Photos
 
 class GifDetailViewController: UIViewController {
 
+	enum Constants {
+		// typical form returned by API
+		static let inputDateFormat = "yyyy-MM-dd hh:mm:ss"
+
+		static let outputDateFormat = "MMMM dd yyyy, h:mm a"
+
+		static let failedToLoadMessage = "Unable to load image"
+	}
+
 	private let viewModel: GifDetailViewModel
+
+	private var gifObject: GifObject {
+		return viewModel.gif
+	}
 
 	let infoLabel: UILabel = {
 		let label = UILabel()
@@ -24,14 +37,12 @@ class GifDetailViewController: UIViewController {
 		return label
 	}()
 
-	let imageView = UIImageView()
+	let imageView = GIFImageView()
 
 	init(viewModel: GifDetailViewModel) {
 		self.viewModel = viewModel
 		super.init(nibName: nil, bundle: nil)
 		title = viewModel.gif.title
-
-		imageView.backgroundColor = UIColor.darkGray
 	}
 
 	required init?(coder: NSCoder) {
@@ -52,76 +63,120 @@ class GifDetailViewController: UIViewController {
 			make.bottom.equalToSuperview().offset(-12)
 		}
 
-		let dateFormatter = DateFormatter()
-		dateFormatter.dateFormat = "yyyy-MM-dd hh:mm:ss"
+		imageView.snp.makeConstraints { make in
+			make.center.equalToSuperview()
+			make.top.leading.greaterThanOrEqualTo(10)
+			make.bottom.trailing.lessThanOrEqualTo(10)
+			make.width.height.equalToSuperview().priority(.high)
 
-		var dateStr = viewModel.gif.importDatetime
-		if let date = dateFormatter.date(from: viewModel.gif.importDatetime) {
-			dateFormatter.dateFormat = "MMMM dd yyyy, h:mm a"
-			dateStr = dateFormatter.string(from: date)
+			// use image's size to fix the aspect ratio
+			if let size = gifObject.fullScreenGifImage?.dimensions {
+				let ratio = size.width / size.height
+				make.width.equalTo(imageView.snp.height).multipliedBy(ratio)
+				make.height.lessThanOrEqualTo(size.height)
+			}
 		}
 
-		let username = viewModel.gif.username
+		loadGif()
+		setSaveButton()
+		setInfoPanel()
+    }
+
+	private func setInfoPanel() {
+		let dateFormatter = DateFormatter()
+		dateFormatter.dateFormat = Constants.inputDateFormat
+		var dateStr = gifObject.importDatetime
+		if let date = dateFormatter.date(from: dateStr) {
+			dateFormatter.dateFormat = Constants.outputDateFormat
+			dateStr = dateFormatter.string(from: date)
+		}
+		let username = gifObject.username
 		if username.isEmpty {
 			infoLabel.text = String(format: "Uploaded on %@", dateStr)
 		} else {
 			infoLabel.text = String(format: "Uploaded %@ by %@", dateStr, username)
 		}
-
-		if let size = viewModel.gif.sizeFullScreenImage {
-			// use image size to fix the aspect ratio
-			imageView.snp.makeConstraints { make in
-				make.center.equalToSuperview()
-				make.top.leading.greaterThanOrEqualTo(10)
-				make.bottom.trailing.lessThanOrEqualTo(10)
-				make.width.equalTo(imageView.snp.height)
-					.multipliedBy(size.width / size.height)
-				make.width.height.equalToSuperview().priority(.high)
-				make.height.lessThanOrEqualTo(size.height)
-			}
-		} else {
-			imageView.snp.makeConstraints { make in
-				make.edges.equalToSuperview()
-			}
-		}
-		loadGif()
-		setSaveButtonItem()
-    }
+	}
 
 	private func loadGif() {
-		if let url = viewModel.gif.urlFullScreenImage {
-			imageView.setGifFromURL(url)
-		} else {
-			infoLabel.text = "Unable to load image"
+
+		// add a low-cost still image to display while loading full gif
+		if let url = gifObject.fixedWidthStillImage?.imageURL {
+			getData(from: url) { data, response, error in
+				DispatchQueue.main.async { [weak self] in
+					guard let self = self, let data = data else { return }
+					self.imageView.image = UIImage(data: data)
+					let spinner = UIActivityIndicatorView(style: .large)
+					spinner.startAnimating()
+					self.imageView.addSubview(spinner)
+					spinner.snp.makeConstraints { (make) in
+						make.center.equalToSuperview()
+					}
+				}
+			}
+		}
+
+		// also load full gif simultaneously and show it if its ready
+		if let url = gifObject.fullScreenGifImage?.imageURL {
+			self.imageView.animate(withGIFURL: url, loopCount: 0) {
+				DispatchQueue.main.async { [weak self] in
+					self?.imageView.image = nil
+					self?.imageView.subviews.forEach {
+						$0.removeFromSuperview()
+					}
+				}
+			}
 		}
 	}
 
-	private func setSaveButtonItem() {
-		self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save,
-		target: self,
-		action: #selector(save))
+	func getData(from url: URL, completion: @escaping (Data?, URLResponse?, Error?) -> ()) {
+		URLSession.shared.dataTask(with: url, completionHandler: completion).resume()
+	}
+
+	func downloadImage(from url: URL) {
+		print("Download Started")
+		getData(from: url) { data, response, error in
+			guard let data = data, error == nil else { return }
+			print(response?.suggestedFilename ?? url.lastPathComponent)
+			print("Download Finished")
+			DispatchQueue.main.async() {
+				self.imageView.image = UIImage(data: data)
+			}
+		}
+	}
+
+	private func setSaveButton(isBusy: Bool = false) {
+		guard !isBusy else {
+			let spinner = UIActivityIndicatorView(style: .medium)
+			navigationItem.rightBarButtonItem = UIBarButtonItem(customView: spinner)
+			spinner.startAnimating()
+			return
+		}
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save,
+															target: self,
+															action: #selector(save))
 	}
 
 	@objc func save() {
-		NetworkingAPI.download(gif: viewModel.gif) { [weak self] data in
-			guard let self = self else { return }
-			if let data = data {
+		setSaveButton(isBusy: true)
 
-				PHPhotoLibrary.shared().performChanges({
-					let request = PHAssetCreationRequest.forAsset()
-					request.addResource(with: .photo, data: data, options: nil)
-				}) { (success, error) in
-					DispatchQueue.main.async {
-						if let error = error {
-							print(error.localizedDescription)
-						} else {
-							let alert = UIAlertController(title: "Success",
-														  message: "Saved to Gallery",
-														  preferredStyle: .alert)
-							alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-							self.present(alert, animated: true) {}
-						}
+		NetworkingAPI.download(gif: viewModel.gif) { [weak self] data in
+			guard let self = self, let data = data else { return }
+			PHPhotoLibrary.shared().performChanges({
+				let request = PHAssetCreationRequest.forAsset()
+				request.addResource(with: .photo, data: data, options: nil)
+			}) { success, error in
+				DispatchQueue.main.async { [weak self] in
+					if let error = error {
+						print(error.localizedDescription)
+					} else {
+						let alert = UIAlertController(title: "Success",
+													  message: "Saved GIF to Gallery!",
+													  preferredStyle: .alert)
+						alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+						self?.present(alert, animated: true) {}
 					}
+					self?.setSaveButton()
 				}
 			}
 		}

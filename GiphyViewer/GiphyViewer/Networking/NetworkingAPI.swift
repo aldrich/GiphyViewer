@@ -132,5 +132,4 @@ class DataFetchOperation: Operation {
 
 struct GetTrendingImagesResponse: Decodable {
 	let data: [GifObject]
-	let pagination: ResponsePagination
 }

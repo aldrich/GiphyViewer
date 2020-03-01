@@ -28,7 +28,7 @@ class TrendingGifsCollectionViewProvider: NSObject, UICollectionViewDataSource {
 		
 		if let cell = cell as? ContentCell {
 			let item = items[indexPath.section][indexPath.row]
-			cell.populate(with: item, index: indexPath.row)
+			cell.populate(with: item)
 		}
 		return cell
 	}

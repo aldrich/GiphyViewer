@@ -74,10 +74,8 @@ class TrendingGifsViewController: UIViewController {
 		prepareCellSizes()
 		collectionView.reloadData()
 
-		// try the appending.
-		viewModel.newItems = { [weak self] gifs in
-			guard let self = self else { return }
-			self.updateWithNewItems(gifs)
+		viewModel.receivedNewGifObjects = { [weak self] gifs in
+			self?.updateWithNewItems(gifs)
 		}
 	}
 
@@ -142,24 +140,12 @@ extension TrendingGifsViewController: UICollectionViewDelegate {
 		viewModel.selectedGif?(gifObject)
 	}
 
-	// will trigger a next page fetch from the API
 	func collectionView(_ collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, at indexPath: IndexPath) {
-
-		guard elementKind == UICollectionView.elementKindSectionFooter else { return }
-
-		// no fetching until you reached end of a populated list
-		guard let gifs = collectionViewProvider.items.first, gifs.count > 0 else { return }
-
-		let elementCount = collectionViewProvider.items
-			.flatMap { $0 }
-			.count
-
-		viewModel.getGifObjects(offset: elementCount) { [weak self] gifs in
-			guard let self = self,
-				let existingItems = self.collectionViewProvider.items.first else { return }
-
-			self.updateWithNewItems(existingItems + gifs)
-		}
+		guard elementKind == UICollectionView.elementKindSectionFooter,
+			indexPath.row == 0, indexPath.section == 0 else { return }
+		guard collectionView.contentOffset != .zero else { return }
+		print("willDisplaySupplementaryView indexPath: \(indexPath)")
+		viewModel.addNextGifObjects()
 	}
 }
 
@@ -179,42 +165,35 @@ extension TrendingGifsViewController: LayoutDelegate {
 }
 
 extension GifObject {
-	
-	var urlFixedWidth: URL? {
-		if let url = fixedWidthDownsampledImage?.url {
-			return URL(string: url)
-		}
-		return nil
-	}
-
-	var heightFixedWidth: CGFloat? {
-		if let heightStr = fixedWidthDownsampledImage?.height,
-			let floatValue = NumberFormatter().number(from: heightStr)?.floatValue {
-			return CGFloat(floatValue)
-		}
-		return nil
-	}
 
 	var fixedWidthDownsampledImage: ImageObject? {
 		return images["fixed_width_downsampled"]
 	}
 
-	var fullScreenImage: ImageObject? {
+	var fullScreenGifImage: ImageObject? {
 		return images["original"]
 	}
 
-	var urlFullScreenImage: URL? {
-		if let url = fullScreenImage?.url {
+	var fixedWidthStillImage: ImageObject? {
+		return images["fixed_width_still"]
+	}
+}
+
+extension ImageObject {
+
+	var imageURL: URL? {
+		if let url = self.url {
 			return URL(string: url)
 		}
 		return nil
 	}
 
-	var sizeFullScreenImage: CGSize? {
-		if let widthStr = fullScreenImage?.width,
-			let heightStr = fullScreenImage?.height,
+	var dimensions: CGSize? {
+		if let widthStr = width,
+			let heightStr = height,
 			let width = Int(widthStr),
-			let height = Int(heightStr) {
+			let height = Int(heightStr),
+			width > 0, height > 0 {
 			return CGSize(width: width, height: height)
 		}
 		return nil

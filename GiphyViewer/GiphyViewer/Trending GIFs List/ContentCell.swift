@@ -7,33 +7,52 @@
 //
 
 import UIKit
-import SwiftyGif
+import Gifu
 
 class ContentCell: UICollectionViewCell {
 
 	override func prepareForReuse() {
 		super.prepareForReuse()
+
+		// only way to avoid another playing gif when a cell is reused
+		let randomColorImage = UIImage(color: .random(),
+									   size: .init(width: 1, height: 1))!
+		imageView.image = randomColorImage
+
+		// free up resources (Gifu framework)
+		imageView.prepareForReuse()
 		label.text = nil
 	}
 
-	let imageView = UIImageView()
+	// When scrolling quickly, a collection view cell can be reused many times
+	// and asked to load different GIF objects. Sometimes the GIFs finish
+	// loading after it's been reused for a different part of the collection view
+	// where another GIF should have been displayed. Throttling would minimize
+	// this issue by ensuring that only the GIF the cell needs to display at this
+	// time should be loaded. But avoid giving too large a delay otherwise the
+	// GIFs would take that much time to start loading.
+	let throttler = Throttler(minimumDelay: 0.75)
+
+	let imageView = GIFImageView()
 
 	let label: UILabel = {
 		let ret = UILabel()
 		ret.textColor = .white
-		ret.backgroundColor = UIColor(white: 0, alpha: 0.6)
+		ret.backgroundColor = UIColor(white: 0, alpha: 0.4)
 		ret.numberOfLines = 0
 		ret.font = .systemFont(ofSize: 12)
 		ret.textAlignment = .center
 		return ret
 	}()
 
-	func populate(with item: GifObject, index: Int) {
+	func populate(with item: GifObject) {
 		backgroundColor = UIColor.random()
 			.withAlphaComponent(0.3)
 		label.text = item.title
-		if let url = item.urlFixedWidth {
-			self.imageView.setGifFromURL(url)
+		if let url = item.fixedWidthDownsampledImage?.imageURL {
+			throttler.throttle { [weak self] in
+				self?.imageView.animate(withGIFURL: url)
+			}
 		}
 	}
 
