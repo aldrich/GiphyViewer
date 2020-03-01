@@ -24,6 +24,24 @@ class NetworkingAPI: NSObject {
 		static let limit = 25
 	}
 
+	class func download(gif: GifObject, completion: @escaping (Data?) -> Void) {
+		let session = URLSession(configuration: .default)
+
+		guard let originalImage = gif.images["original"], let hqURLStr = originalImage.url else {
+			completion(nil)
+			return
+		}
+		let request = URLRequest(url: URL(string: hqURLStr)!)
+
+		let operation = DataFetchOperation(session: session, request: request,
+										   completion: { (data, response, error) -> Void in
+											DispatchQueue.main.async {
+												completion(data)
+											}
+		})
+		queue.addOperation(operation)
+	}
+
 	class func getTrendingGifs(offset: Int, limit: Int = Constants.limit,
 							   completion: @escaping CompletionBlock) {
 

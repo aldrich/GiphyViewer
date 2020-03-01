@@ -17,19 +17,21 @@ class GifDetailViewController: UIViewController {
 
 	let infoLabel: UILabel = {
 		let label = UILabel()
-		label.font = .systemFont(ofSize: 16)
+		label.font = .systemFont(ofSize: 12)
 		label.numberOfLines = 0
+		label.textColor = .white
+		label.textAlignment = .center
 		return label
 	}()
-
 
 	let imageView = UIImageView()
 
 	init(viewModel: GifDetailViewModel) {
 		self.viewModel = viewModel
 		super.init(nibName: nil, bundle: nil)
-
 		title = viewModel.gif.title
+
+		imageView.backgroundColor = UIColor.darkGray
 	}
 
 	required init?(coder: NSCoder) {
@@ -45,7 +47,9 @@ class GifDetailViewController: UIViewController {
 		view.addSubview(infoLabel)
 
 		infoLabel.snp.makeConstraints { make in
-			make.bottom.trailing.equalToSuperview().offset(-10)
+			make.centerX.equalToSuperview()
+			make.width.equalToSuperview()
+			make.bottom.equalToSuperview().offset(-12)
 		}
 
 		let dateFormatter = DateFormatter()
@@ -58,7 +62,6 @@ class GifDetailViewController: UIViewController {
 		}
 
 		let username = viewModel.gif.username
-
 		if username.isEmpty {
 			infoLabel.text = String(format: "Uploaded on %@", dateStr)
 		} else {
@@ -81,17 +84,23 @@ class GifDetailViewController: UIViewController {
 				make.edges.equalToSuperview()
 			}
 		}
+		loadGif()
+		setSaveButtonItem()
+    }
 
+	private func loadGif() {
 		if let url = viewModel.gif.urlFullScreenImage {
 			imageView.setGifFromURL(url)
 		} else {
 			infoLabel.text = "Unable to load image"
 		}
+	}
 
+	private func setSaveButtonItem() {
 		self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save,
-																 target: self,
-																 action: #selector(save))
-    }
+		target: self,
+		action: #selector(save))
+	}
 
 	@objc func save() {
 		NetworkingAPI.download(gif: viewModel.gif) { [weak self] data in
