@@ -130,7 +130,7 @@ class PinterestLayoutDelegate: NSObject, LayoutDelegate {
 
 extension GifObject {
 	static func with(id: String) -> GifObject {
-		return GifObject(bitlyUrl: "", embedUrl: "", id: id,
+		return GifObject(id: id,
 						 images: [:], importDatetime: "", title: "",
 						 trendingDatetime: "", url: "", username: "")
 	}

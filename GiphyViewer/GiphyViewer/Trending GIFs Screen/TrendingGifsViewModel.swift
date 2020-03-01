@@ -15,20 +15,27 @@ class TrendingGifsViewModel {
 		static let pagesToLoad = 20
 	}
 
+	let networking: GiphyAPIClient
+
 	var selectedGif: ((GifObject) -> Void)?
 
 	var receivedNewGifObjects: (([GifObject]) -> Void)?
 
 	var results = [Int: [GifObject]]()
 
-	init() {
+	init(networking: GiphyAPIClient) {
+		self.networking = networking
+		fetchInitialData()
+	}
+
+	private func fetchInitialData() {
 		// initial load pages 0 to 24 (25 items each)
 		let range = 0 ..< Constants.pagesToLoad
 
 		range.forEach { index in
 			let limit = Constants.limit // i.e., 25 GIFs
 			let offset = index * limit
-			Networking.getTrendingGifs(offset: offset, limit: limit) { [weak self] gifs in
+			networking.getTrendingGifs(offset: offset, limit: limit) { [weak self] gifs in
 				guard let self = self else { return }
 				self.results[index] = gifs
 				self.receivedNewGifObjects?(self.flattenedGifsResults)
@@ -40,7 +47,7 @@ class TrendingGifsViewModel {
 	func addNextGifObjects() {
 		let index = nextIndex()
 		let offset = Constants.limit * index
-		Networking.getTrendingGifs(offset: offset) { [weak self] gifs in
+		networking.getTrendingGifs(offset: offset) { [weak self] gifs in
 			guard let self = self else { return }
 			self.results[index] = gifs
 			self.receivedNewGifObjects?(self.flattenedGifsResults)

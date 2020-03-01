@@ -11,12 +11,11 @@ import UIKit
 
 protocol Coordinator: AnyObject {
     var navigationController: UINavigationController { get set }
-    var parentCoordinator: Coordinator? { get set }
-
+	var parentCoordinator: Coordinator? { get set }
     func start()
-    func start(coordinator: Coordinator)
-    func didFinish(coordinator: Coordinator)
-    func removeChildCoordinators()
+	func start(coordinator: Coordinator)
+	func didFinish(coordinator: Coordinator)
+	func removeChildCoordinators()
 }
 
 class BaseCoordinator: Coordinator {
@@ -49,7 +48,9 @@ class BaseCoordinator: Coordinator {
 
 enum ViewControllerUtils {
 
-    static func setRootViewController(window: UIWindow, viewController: UIViewController, withAnimation: Bool) {
+    static func setRootViewController(window: UIWindow,
+									  viewController: UIViewController,
+									  withAnimation: Bool) {
 
         if !withAnimation {
             window.rootViewController = viewController

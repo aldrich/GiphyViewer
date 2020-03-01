@@ -8,11 +8,11 @@
 
 import Foundation
 
-class Networking: NSObject {
+class GiphyAPIClient {
 
-	typealias CompletionBlock = ([GifObject]) -> Void
+	typealias GifsCompletionBlock = ([GifObject]) -> Void
 
-	static let queue: OperationQueue = {
+	let queue: OperationQueue = {
 		let queue = OperationQueue()
 		queue.maxConcurrentOperationCount = 1
 		return queue
@@ -24,7 +24,19 @@ class Networking: NSObject {
 		static let limit = 25
 	}
 
-	static func download(url: URL, completion: @escaping (Data?) -> Void) {
+	static func decodeAsTrendingImages(data: Data) -> [GifObject] {
+		do {
+			let decoder = JSONDecoder()
+			decoder.keyDecodingStrategy = .convertFromSnakeCase
+			let response = try decoder.decode(GetTrendingImagesResponse.self, from: data)
+			return response.data
+		} catch {
+			print(error)
+			return []
+		}
+	}
+
+	func download(url: URL, completion: @escaping (Data?) -> Void) {
 		let session = URLSession(configuration: .default)
 		let request = URLRequest(url: url)
 		let operation = DataFetchOperation(session: session, request: request,
@@ -36,29 +48,25 @@ class Networking: NSObject {
 		queue.addOperation(operation)
 	}
 
-	static func getTrendingGifs(offset: Int, limit: Int = Constants.limit,
-							   completion: @escaping CompletionBlock) {
-
-		let session = URLSession(configuration: .default)
+	func getTrendingGifsRequest(offset: Int, limit: Int = Constants.limit) -> URLRequest {
 		let urlString = String(format: Constants.urlStrFormat, Constants.apiKey, offset, limit)
 		let url = URL(string: urlString)!
 		let request = URLRequest(url: url)
+		return request
+	}
 
-		let operation = DataFetchOperation(session: session, request: request,
-									   completion: { (data, response, error) -> Void in
+	func getTrendingGifs(offset: Int, limit: Int = Constants.limit,
+							   completion: @escaping GifsCompletionBlock) {
+
+		let request = getTrendingGifsRequest(offset: offset, limit: limit)
+
+		let session = URLSession(configuration: .default)
+
+		let operation = DataFetchOperation(session: session, request: request, completion: { (data, _, _) -> Void in
+			guard let data = data else { return }
 			DispatchQueue.main.async {
-				do {
-					if let data = data {
-						let decoder = JSONDecoder()
-						decoder.keyDecodingStrategy = .convertFromSnakeCase
-						let response = try decoder.decode(GetTrendingImagesResponse.self, from: data)
-						let gifs = response.data
-						completion(gifs)
-					}
-				} catch {
-					print(error)
-					completion([])
-				}
+				let gifs = GiphyAPIClient.decodeAsTrendingImages(data: data)
+				completion(gifs)
 			}
 		})
 		queue.addOperation(operation)
