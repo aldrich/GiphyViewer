@@ -56,10 +56,17 @@ class GifDetailViewModel {
 	/// Completion block is on the main thread.
 	func saveDataAsGIFToPhotoGallery(data: Data,
 									 completion: @escaping (Error?) -> Void) {
+		
+		guard PHPhotoLibrary.authorizationStatus() != .notDetermined else {
+			PHPhotoLibrary.requestAuthorization { [weak self] (status) in
+				self?.saveDataAsGIFToPhotoGallery(data: data, completion: completion)
+			}
+			return
+		}
 		PHPhotoLibrary.shared().performChanges({
 			let request = PHAssetCreationRequest.forAsset()
 			request.addResource(with: .photo, data: data, options: nil)
-		}) { _, error in
+		}) { success, error in
 			DispatchQueue.main.async {
 				completion(error)
 			}
