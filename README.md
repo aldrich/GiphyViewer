@@ -2,6 +2,8 @@
 
 This is an iOS application that uses the Giphy API to load and display trending GIFs.
 
+![Sample 1](/samples/sample-1.gif) ![Sample 2](/samples/sample-2.gif)
+
 ### Feature List
 
 - [x] Smooth scrolling on device (no stutter on iPhone XS Max)
