@@ -14,8 +14,9 @@ It's a project that uses the Giphy API to load and display trending GIFs.
 
 ### Frameworks
 
-- Gifu
-- Snapkit
+- Gifu - used it to display animated GIFs on UIImageViews. It has a handy completion block for when the GIF is finally loaded.
+- Snapkit - to make programmatic constraints easier to understand
+- PINCache - used to support caching downloaded GIFs so you can instantly load the animation the next time around. Includes a method that can evict old entries automatically so the disk doesn't get filled up..
 
 ### Architectures
 
@@ -31,7 +32,6 @@ Tested on Xcode 11.3. Minimum version supported is iOS 13.
 
 ### Limitations / Future Work
 
-- If you scroll very quickly and the network is slow you may begin to see GIFs loaded in cells that are from a previously loaded GIF
 - Should be able to cache visited GIF screens so they won't need to be loaded again
 - Turning phone to landscape scrolls it back to the top. Preferably it should preserve scroll order.
 - Handle no internet / API errors more gracefully.
