@@ -20,6 +20,8 @@ class TrendingGifsViewController: UIViewController {
 	private let collectionView = UICollectionView(frame: .zero,
 												  collectionViewLayout: UICollectionViewFlowLayout())
 	
+	private let throttler = Throttler(minimumDelay: 0.5)
+	
 	init(viewModel: TrendingGifsViewModel) {
 		self.viewModel = viewModel
 		super.init(nibName: nil, bundle: nil)
@@ -75,13 +77,23 @@ class TrendingGifsViewController: UIViewController {
 		collectionView.reloadData()
 
 		viewModel.receivedNewGifObjects = { [weak self] gifs in
-			self?.updateWithNewItems(gifs)
+			// self?.updateWithNewItems(gifs)
+			self?.receivedGifs = gifs
+			
+			self?.throttler.throttle {
+				self?.updateWithNewItems()
+			}
 		}
 
 		viewModel.fetchInitialData()
 	}
+	
+	private var receivedGifs: [GifObject]?
 
-	private func updateWithNewItems(_ items: [GifObject]) {
+	private func updateWithNewItems() {
+		
+		guard let items = receivedGifs else { return }
+		
 		// using collection diffing to optimize reloads
 		guard let currItems = self.collectionViewProvider.items.first else { return }
 
@@ -149,6 +161,12 @@ extension TrendingGifsViewController: UICollectionViewDelegate {
 		print("willDisplaySupplementaryView indexPath: \(indexPath)")
 		viewModel.addNextGifObjects()
 	}
+	
+//	func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+//		
+//		guard let cell = cell as? ContentCell else { return }
+//		cell.startAnimatingGif()
+//	}
 }
 
 extension TrendingGifsViewController: LayoutDelegate {

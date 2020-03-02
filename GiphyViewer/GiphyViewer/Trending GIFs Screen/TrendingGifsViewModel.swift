@@ -16,9 +16,12 @@ class TrendingGifsViewModel {
 	}
 
 	let networking: GiphyAPIClient
-
+	let cache: GIFCache
+	
 	var selectedGif: ((GifObject) -> Void)?
 
+	// closure that sends the complete list of GIF results (so far) that have
+	// returned from the API to the receiver
 	var receivedNewGifObjects: (([GifObject]) -> Void)?
 
 	var results = [Int: [GifObject]]()
@@ -28,9 +31,11 @@ class TrendingGifsViewModel {
 
 	init(initialPagesToLoad: Int = Constants.pagesToLoad,
 		 gifsPerPage: Int = Constants.limit,
-		 networking: GiphyAPIClient) {
+		 networking: GiphyAPIClient,
+		 cache: GIFCache = .shared) {
 
 		self.networking = networking
+		self.cache = cache
 		self.initialPagesToLoad = initialPagesToLoad
 		self.limit = gifsPerPage
 	}
@@ -41,10 +46,35 @@ class TrendingGifsViewModel {
 
 		range.forEach { index in
 			let offset = index * limit
-			networking.getTrendingGifs(offset: offset, limit: limit) { [weak self] gifs in
+			
+			let isBackground = index > 2
+			
+			networking.getTrendingGifs(offset: offset, limit: limit, background: isBackground) { [weak self] gifs in
 				guard let self = self else { return }
 				self.results[index] = gifs
-				self.receivedNewGifObjects?(self.flattenedGifsResults)
+				
+				let flattenedGifs = self.flattenedGifsResults
+				self.receivedNewGifObjects?(flattenedGifs)
+				
+				
+				// cache the gif objects
+				flattenedGifs.forEach { [weak self] gif in
+					guard let self = self else { return }
+					
+					guard !gif.isCached(forUnit: .small, in: self.cache) else {
+						return
+					}
+					guard let url = gif.fixedWidthDownsampledImage?.imageURL else { return }
+					
+					// maybe background queue?
+					// print("downloading gif (fixed width) for id \(cacheKey)")
+					self.networking.download(url: url, background: true, completion: { data in
+						guard let data = data else { return }
+						
+						gif.cacheData(data, forUnit: .small, in: self.cache)
+					})
+				}
+				
 			}
 		}
 	}

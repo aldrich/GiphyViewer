@@ -79,20 +79,46 @@ class GifDetailViewController: UIViewController {
 	private func loadGifImage() {
 		// add a low-cost still image to display while loading full gif
 		if let url = stillImageURL {
-			viewModel.fetchData(from: url) { [weak self] data in
-				guard let self = self, let data = data else { return }
+			if let data = gifObject.cachedData(forUnit: .still) {
 				self.imageView.image = UIImage(data: data)
 				self.imageView.showSpinner()
+			} else {
+				viewModel.fetchData(from: url) { [weak self] data in
+					guard let self = self, let data = data else { return }
+					self.imageView.image = UIImage(data: data)
+					self.imageView.showSpinner()
+					self.gifObject.cacheData(data, forUnit: .still)
+				}
 			}
 		}
+		
 		// simultaneously load full gif (which appears later) and show it if
 		// it's ready, removing the static placeholder image.
 		if let url = fullScreenGifImageURL {
-			imageView.animate(withGIFURL: url) { // on GIF load completion,
-				DispatchQueue.main.async { [weak self] in
-					self?.imageView.showSpinner(false)
-					self?.imageView.image = nil
+			
+			if let data = gifObject.cachedData(forUnit: .large) {
+				imageView.showSpinner(false)
+				imageView.animate(withGIFData: data) {
+					DispatchQueue.main.async { [weak self] in
+						self?.imageView.showSpinner(false)
+						self?.imageView.image = nil
+					}
 				}
+			} else {
+				
+				viewModel.fetchData(from: url) { [weak self] data in
+					guard let data = data else { return }
+					
+					self?.imageView.animate(withGIFData: data, completionHandler: { // on Gif Load completion
+						DispatchQueue.main.async { [weak self] in
+							self?.gifObject.cacheData(data, forUnit: .large)
+							self?.imageView.showSpinner(false)
+							self?.imageView.image = nil
+						}
+					})
+				}
+			
+				
 			}
 		}
 	}

@@ -1,20 +1,24 @@
 PODS:
   - Gifu (3.2.0)
+  - PINCache (2.3)
   - SnapKit (5.0.1)
 
 DEPENDENCIES:
   - Gifu
+  - PINCache
   - SnapKit
 
 SPEC REPOS:
   trunk:
     - Gifu
+    - PINCache
     - SnapKit
 
 SPEC CHECKSUMS:
   Gifu: 7bcb6427457d85e0b4dff5a84ec5947ac19a93ea
+  PINCache: ce36ed282031b92fc7733ffe831f474ff80fddc2
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
 
-PODFILE CHECKSUM: acb5e5742e9102252784824721da8012a96f8326
+PODFILE CHECKSUM: b2ac0660671574952a825f71a23477f499767679
 
 COCOAPODS: 1.8.4

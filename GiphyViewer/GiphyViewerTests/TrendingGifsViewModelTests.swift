@@ -70,7 +70,8 @@ class TrendingGifsViewModelTests: XCTestCase {
 }
 
 class MockGiphyClient: GiphyAPIClient {
-	override func getTrendingGifs(offset: Int, limit: Int = Constants.limit,
+
+	override func getTrendingGifs(offset: Int, limit: Int = Constants.limit, background: Bool = false,
 								  completion: @escaping GiphyAPIClient.GifsCompletionBlock) {
 		let range = (offset..<offset+limit)
 		let mapped = range.map {

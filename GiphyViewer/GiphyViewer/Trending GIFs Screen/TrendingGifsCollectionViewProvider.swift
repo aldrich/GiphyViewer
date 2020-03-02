@@ -31,6 +31,7 @@ class TrendingGifsCollectionViewProvider: NSObject, UICollectionViewDataSource {
 			let item = items[indexPath.section][indexPath.row]
 			cell.populate(with: item)
 			cell.accessibilityIdentifier = "index-\(indexPath.row)"
+			cell.startAnimatingGif()
 		}
 		return cell
 	}

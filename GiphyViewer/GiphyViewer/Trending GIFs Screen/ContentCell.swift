@@ -17,34 +17,15 @@ class ContentCell: UICollectionViewCell {
 
 	override func prepareForReuse() {
 		super.prepareForReuse()
+		
 		// free up resources (Gifu framework)
 		imageView.prepareForReuse()
-		imageView.image = UIImage(color: getRandomColor())!
 	}
-
-	// When scrolling quickly, a collection view cell can be reused many times
-	// and asked to load different GIF objects. Sometimes the GIFs finish
-	// loading after it's been reused for a different part of the collection view
-	// where another GIF should have been displayed. Throttling would minimize
-	// this issue by ensuring that only the GIF the cell needs to display at this
-	// time should be loaded. But avoid giving too large a delay otherwise the
-	// GIFs would take that much time to start loading.
-	let throttler = Throttler(minimumDelay: 0.75)
 
 	let imageView = GIFImageView()
-
-	func populate(with item: GifObject) {
-		backgroundColor = getRandomColor()
-		imageView.image = UIImage(color: getRandomColor())!
-		guard let url = item.fixedWidthDownsampledImage?.imageURL else {
-			return
-		}
-		throttler.throttle { [weak self] in
-			self?.imageView.animate(withGIFURL: url)
-		}
-		self.accessibilityLabel = item.title
-	}
-
+	
+	var gifObject: GifObject?
+	
 	override init(frame: CGRect) {
 		super.init(frame: frame)
 
@@ -56,6 +37,28 @@ class ContentCell: UICollectionViewCell {
 
 	required init?(coder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
+	}
+	
+	func populate(with item: GifObject) {
+		self.accessibilityLabel = item.title
+		backgroundColor = getRandomColor()
+		imageView.image = UIImage(color: getRandomColor())!
+		self.gifObject = item
+	}
+	
+	func startAnimatingGif() {
+		self.loadGif()
+	}
+	
+	// look for cached data, and if found, return it instead of
+	private func loadGif() {
+		if let data = gifObject?.cachedData(forUnit: .small) {
+			imageView.animate(withGIFData: data)
+		} else {
+			if let url = gifObject?.fixedWidthDownsampledImage?.imageURL {
+				imageView.animate(withGIFURL: url)
+			}
+		}
 	}
 }
 

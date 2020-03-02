@@ -14,7 +14,14 @@ class GiphyAPIClient {
 
 	let queue: OperationQueue = {
 		let queue = OperationQueue()
-		queue.maxConcurrentOperationCount = 1
+		queue.maxConcurrentOperationCount = 4
+		return queue
+	}()
+	
+	let bgQueue: OperationQueue = {
+		let queue = OperationQueue()
+		queue.qualityOfService = .background
+		queue.maxConcurrentOperationCount = 4
 		return queue
 	}()
 
@@ -36,7 +43,7 @@ class GiphyAPIClient {
 		}
 	}
 
-	func download(url: URL, completion: @escaping (Data?) -> Void) {
+	func download(url: URL, background: Bool = false, completion: @escaping (Data?) -> Void) {
 		let session = URLSession(configuration: .default)
 		let request = URLRequest(url: url)
 		let operation = DataFetchOperation(session: session, request: request,
@@ -45,7 +52,11 @@ class GiphyAPIClient {
 												completion(data)
 											}
 		})
-		queue.addOperation(operation)
+		if background {
+			bgQueue.addOperation(operation)
+		} else {
+			queue.addOperation(operation)
+		}
 	}
 
 	func getTrendingGifsRequest(offset: Int, limit: Int = Constants.limit) -> URLRequest {
@@ -56,7 +67,8 @@ class GiphyAPIClient {
 	}
 
 	func getTrendingGifs(offset: Int, limit: Int = Constants.limit,
-							   completion: @escaping GifsCompletionBlock) {
+						 background: Bool = false,
+						 completion: @escaping GifsCompletionBlock) {
 
 		let request = getTrendingGifsRequest(offset: offset, limit: limit)
 
@@ -69,7 +81,12 @@ class GiphyAPIClient {
 				completion(gifs)
 			}
 		})
-		queue.addOperation(operation)
+		
+		if background {
+			bgQueue.addOperation(operation)
+		} else {
+			queue.addOperation(operation)
+		}
 	}
 }
 

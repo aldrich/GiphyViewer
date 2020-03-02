@@ -28,6 +28,7 @@
 		BE6DD753240BDD6900902871 /* Thread+UnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6DD752240BDD6900902871 /* Thread+UnitTests.swift */; };
 		BE6DD755240BEA3000902871 /* TrendingGifsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6DD754240BEA3000902871 /* TrendingGifsViewModelTests.swift */; };
 		BE6DD757240BF6C100902871 /* GifDetailViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6DD756240BF6C100902871 /* GifDetailViewModelTests.swift */; };
+		BE71E7D8240D16170021739F /* GIFCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE71E7D7240D16170021739F /* GIFCache.swift */; };
 		BEAB5FE9240AA244009462C1 /* AppDelegate+Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAB5FE8240AA244009462C1 /* AppDelegate+Appearance.swift */; };
 		BEAB5FEC240B57A1009462C1 /* Throttler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAB5FEB240B57A1009462C1 /* Throttler.swift */; };
 		BEBB798A240A0FA1002375AE /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBB797D240A0FA1002375AE /* AppCoordinator.swift */; };
@@ -93,6 +94,7 @@
 		BE6DD752240BDD6900902871 /* Thread+UnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Thread+UnitTests.swift"; sourceTree = "<group>"; };
 		BE6DD754240BEA3000902871 /* TrendingGifsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingGifsViewModelTests.swift; sourceTree = "<group>"; };
 		BE6DD756240BF6C100902871 /* GifDetailViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GifDetailViewModelTests.swift; sourceTree = "<group>"; };
+		BE71E7D7240D16170021739F /* GIFCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GIFCache.swift; sourceTree = "<group>"; };
 		BEAB5FE8240AA244009462C1 /* AppDelegate+Appearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Appearance.swift"; sourceTree = "<group>"; };
 		BEAB5FEB240B57A1009462C1 /* Throttler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Throttler.swift; sourceTree = "<group>"; };
 		BEBB797D240A0FA1002375AE /* AppCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
@@ -255,6 +257,7 @@
 			isa = PBXGroup;
 			children = (
 				BE6D5B73240A2D2500076D53 /* GiphyAPIClient.swift */,
+				BE71E7D7240D16170021739F /* GIFCache.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
@@ -547,6 +550,7 @@
 				BEBB798B240A0FA1002375AE /* TrendingGifsListCoordinator.swift in Sources */,
 				BEBB798C240A0FA1002375AE /* Coordinator.swift in Sources */,
 				BEAB5FEC240B57A1009462C1 /* Throttler.swift in Sources */,
+				BE71E7D8240D16170021739F /* GIFCache.swift in Sources */,
 				BEBB7991240A0FA1002375AE /* TrendingGifsViewController.swift in Sources */,
 				BEBB798E240A0FA1002375AE /* TrendingGifsCollectionViewProvider.swift in Sources */,
 				BE6D5B7F240A71DA00076D53 /* GridLayout.swift in Sources */,
@@ -732,13 +736,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 7HXAT95HQ9;
 				INFOPLIST_FILE = GiphyViewer/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = co.aldrich.GiphyViewer;
+				PRODUCT_BUNDLE_IDENTIFIER = com.freelancer.messenger;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -751,13 +756,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 7HXAT95HQ9;
 				INFOPLIST_FILE = GiphyViewer/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = co.aldrich.GiphyViewer;
+				PRODUCT_BUNDLE_IDENTIFIER = com.freelancer.messenger;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
