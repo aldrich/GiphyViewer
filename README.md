@@ -16,9 +16,11 @@ This is an iOS application that uses the Giphy API to load and display trending 
 
 ### 3rd Party Frameworks Used
 
-- Gifu - used it to display animated GIFs on UIImageViews. It has a handy completion block for when the GIF is finally loaded.
-- Snapkit - to make programmatic constraints easier to understand
-- PINCache - used to support caching downloaded GIFs so you can instantly load the animation the next time around. Includes a method that can evict old entries automatically so the disk doesn't get filled up..
+- [Gifu](https://github.com/kaishin/Gifu) - used it to display animated GIFs on UIImageViews. It has a handy completion block for when the GIF is finally loaded.
+- [Snapkit](https://github.com/SnapKit/SnapKit) - to make programmatic constraints easier to understand
+- [PINCache](https://github.com/pinterest/PINCache) - used to support caching downloaded GIFs so you can instantly load the animation the next time around. Includes a method that can evict old entries automatically so the disk doesn't get filled up..
+
+Of the three, I'd consider only Gifu to be a must have; on the other hand, Snapkit makes writing constraints more natural; and PINCache improves viewing experience but otherwise uses the same loading mechanism for the GIFs.
 
 ### Approaches and Patterns
 
