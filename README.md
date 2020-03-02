@@ -4,11 +4,11 @@ It's a project that uses the Giphy API to load and display trending GIFs.
 
 ### Feature List
 
-- [x] 20 pages initially loaded, with 25 GIFs each
-- [x] multi-column display
-- [x] full screen display
-- [x] landscape orientation support
-- [x] save to gallery
+- [x] Smooth scrolling on device (no stutter on iPhone XS Max)
+- [x] 20 pages loaded on startup, with 25 GIFs each page
+- [x] multi-column display (# of columns adapts based on screen orientation and device size)
+- [x] single GIF full screen display
+- [x] save GIF to gallery
 - [x] progressive loading
 - [x] optimized bandwidth and CPU usage...loads and displays still image until original GIF is fully loaded
 
