@@ -43,6 +43,7 @@ Tested on Xcode 11.3. Minimum version supported is iOS 13.
 
 ### Issues / Limitations / Future Work
 
+- Add pull-to-refresh
 - Turning phone to landscape scrolls it back to the top. Preferably it should preserve scroll order.
 - Handle no internet / API errors more gracefully.
 - Show download progress indicators for the original GIF.
